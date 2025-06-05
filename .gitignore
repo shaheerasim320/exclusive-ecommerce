@@ -1,0 +1,7 @@
+node_modules/
+.vscode/
+*.rar
+*.png
+*.jpg
+*.txt
+.env
