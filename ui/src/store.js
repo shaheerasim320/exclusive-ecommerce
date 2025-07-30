@@ -4,14 +4,13 @@ import productReducer from './slices/productSlice'
 import userSlice from "./slices/userSlice"
 import cartReducer from "./slices/cartSlice"
 import wishlistReducer from "./slices/wishlistSlice"
-import billingSlice from "./slices/billingSlice"
-import paymentSlice from "./slices/paymentSlice"
 import orderSlice from "./slices/orderSlice"
 import cardSlice from "./slices/cardSlice"
 import addressSlice from "./slices/addressSlice"
 import categorySlice from "./slices/CategorySlice"
 import imageSlice from "./slices/imageSlice"
 import authSlice from "./slices/authSlice"
+import flashSaleSlice from "./slices/flashSaleSlice"
 import { injectStore } from './api/axiosInstance';
 
 
@@ -22,14 +21,13 @@ export const store = configureStore({
         user: userSlice,
         cart: cartReducer,
         wishlist: wishlistReducer,
-        billing: billingSlice,
-        payment: paymentSlice,
         order: orderSlice,
         card: cardSlice,
         address: addressSlice,
         category: categorySlice,
         image: imageSlice,
         auth: authSlice,
+        flashSales:flashSaleSlice
     }
 });
 

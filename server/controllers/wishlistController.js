@@ -10,7 +10,7 @@ export const addToWishlist = async (req, res) => {
     const { product } = req.body;
 
     try {
-        const query = req.user?._id ? { user: req.user._id } : { guestId: req.guestId };
+        const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
         let wishlist = await Wishlist.findOne(query);
 
         if (!wishlist) {
@@ -18,7 +18,7 @@ export const addToWishlist = async (req, res) => {
         }
 
         const alreadyExists = wishlist.items.some(item =>
-            item.product.toString() === product.toString()
+            item.product == product
         );
 
         if (!alreadyExists) {
@@ -31,7 +31,7 @@ export const addToWishlist = async (req, res) => {
         res.status(200).json({ items: wishlist.items });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({ message: "Server error, please try again" });
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -39,8 +39,8 @@ export const removeFromWishlist = async (req, res) => {
     const { wishlistItemId } = req.body;
 
     try {
-        const query = req.user?._id ? { user: req.user._id } : { guestId: req.guestId };
-        
+        const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
+
         await Wishlist.updateOne(query, { $pull: { items: { _id: wishlistItemId } } });
 
         const wishlist = await Wishlist.findOne(query).populate("items.product");
@@ -48,26 +48,75 @@ export const removeFromWishlist = async (req, res) => {
         res.status(200).json({ items: wishlist?.items || [] });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({ message: "Server error, please try again" });
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 export const mergeWishlist = async (req, res) => {
-    const { guestItems } = req.body.guestItems;
+    const guestId = req.guestId;
+    const userId = req.user?.userId
+    const { mergeOptions } = req.body;
+
     try {
-        const wishlist = await Wishlist.findOne({ user: req.user._id });
-        for (const guestItem of guestItems) {
-            const alreadyExists = wishlist.items.some(item => item.product == guestItem.product)
-            if (!alreadyExists) {
-                wishlist.items.push({ product: guestItem.product });
-            }
+        const guestWishlist = await Wishlist.findOne({ guestId });
+        const userWishlist = await Wishlist.findOne({ user: userId });
+
+        if (!guestWishlist && !userWishlist) {
+            return res.status(404).json({ message: "No wishlist found for guest or user" });
         }
-        wishlist.save();
-        res.status(200).json({ items: wishlist.items });
+
+
+        guestWishlist.items.forEach(guestItem => {
+            const existingIndex = userWishlist.items.findIndex(item =>
+                item.product == guestItem.product
+            );
+
+            if (existingIndex === -1) {
+                userWishlist.items.push(guestItem);
+            }
+        });
+
+        // Save the updated wishlist
+        await userWishlist.save();
+
+        // Clear guest wishlist after merging
+        await Wishlist.findOneAndDelete({ guestId });
+
+
+        // Return the updated wishlist data
+        const updatedWishlist = await userWishlist.populate("items.product");
+        console.log(updatedWishlist);
+        res.status(200).json({ message: "Wishlist merged successfully", wishlist: updatedWishlist.items });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ message: "Server error, please try again" });
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
+
+export const discardGuestWishlist = async (req, res) => {
+    try {
+        const guestId = req.guestId;
+
+        if (!guestId) {
+            return res.status(400).json({ message: "Guest ID is required" });
+        }
+
+        const guestWishlist = await Wishlist.findOne({ guestId });
+
+        if (!guestWishlist) {
+            return res.status(404).json({ message: "Guest wishlist not found" });
+        }
+
+        // Delete the wishlist
+        await Wishlist.deleteOne({ guestId });
+
+        return res.status(200).json({ message: "Guest wishlist discarded successfully" });
+
+    } catch (error) {
+        console.error("Error discarding guest wishlist:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 
 const moveAllItemsToCart = async (req, res) => {
     // const userID = req.user.userId;
@@ -155,12 +204,23 @@ const moveAllItemsToCart = async (req, res) => {
 
 export const getWishlistItems = async (req, res) => {
     try {
-        const query = req.user?._id ? { user: req.user._id } : { guestId: req.guestId };
+        const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
         const wishlist = await Wishlist.findOne(query).populate("items.product");
         res.status(200).json({ items: wishlist?.items || [] });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Server error, please try again" });
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const getGuestWishlistItems = async (req, res) => {
+    const guestId = req.guestId;
+    try {
+        const wishlist = await Wishlist.findOne({ guestId }).populate("items.product");
+        res.status(200).json({ items: wishlist?.items || [] });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, isPending, isRejected, isFulfilled } from "@reduxjs/toolkit";
 import axios from "axios";
+import api from "../api/axiosInstance";
 
 const initialState = {
     product: null,
@@ -45,17 +46,6 @@ export const fetchAllProducts = createAsyncThunk(
     }
 );
 
-export const fetchFlashSaleProducts = createAsyncThunk(
-    "products/fetchFlashSaleProducts",
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await axios.get("http://localhost:8080/api/v1/products/flash-sale-products");
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch flash sale products")
-        }
-    }
-);
 
 export const fetchBestSellingProducts = createAsyncThunk(
     "products/fetchBestSellingProducts",
@@ -178,11 +168,6 @@ const productSlice = createSlice({
                 state.allProducts = action.payload;
                 state.error = null
             })
-            .addCase(fetchFlashSaleProducts.fulfilled, (state, action) => {
-                state.loading = false;
-                state.flashSaleProducts = action.payload;
-                state.error = null
-            })
             .addCase(fetchBestSellingProducts.fulfilled, (state, action) => {
                 state.loading = false;
                 state.bestSellingProducts = action.payload;
@@ -194,14 +179,14 @@ const productSlice = createSlice({
                 state.error = null
             })
             .addMatcher(
-                (action) => isPending(fetchProducts, fetchBestSellingProducts, fetchFlashSaleProducts, fetchProductByID, fetchAllProducts, addProduct, updateProduct, deleteProduct)(action),
+                (action) => isPending(fetchProducts, fetchBestSellingProducts, fetchProductByID, fetchAllProducts, addProduct, updateProduct, deleteProduct)(action),
                 (state) => {
                     state.loading = true
                     state.error = null
                 }
             )
             .addMatcher(
-                (action) => isRejected(fetchProducts, fetchBestSellingProducts, fetchFlashSaleProducts, fetchProductByID, fetchAllProducts, addProduct, updateProduct, deleteProduct)(action),
+                (action) => isRejected(fetchProducts, fetchBestSellingProducts, fetchProductByID, fetchAllProducts, addProduct, updateProduct, deleteProduct)(action),
                 (state, action) => {
                     state.loading = false
                     state.error = action.payload

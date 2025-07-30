@@ -6,39 +6,59 @@ const Cancel_ReturnOrderRow = ({ order }) => {
     const handleButton = () => {
         navigate(`/order-detail?orderID=${order.orderId}`, { state: { orderID: order._id } })
     }
-    console.log(order)
     return (
-        <>
-            {/* Wrap the content of the row with <td> elements */}
-            <td colSpan="4">
-                <div className="return w-[900px] shadow">
-                    <div className="w-[880px] mx-auto flex py-[14px] justify-between items-center">
-                        <div className="order-date-and-order-num">
-                            <div className="ordered-date text-[14px]">Requested on {String(new Date(order?.orderDate).getMonth() + 1).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getDate()).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getFullYear())}</div>
-                            <div className="order-number text-[12px]">Order <span className="text-[#1A9CB7] cursor-pointer" onClick={handleButton}>#{order.orderId}</span></div>
-                        </div>
-                        <span className="text-[#DB4444] hover:text-[#A33737] cursor-pointer" onClick={handleButton}>MORE DETAILS</span>
+        // Main container for each return item, now a responsive div
+        <div className="return-card w-full shadow-md rounded-lg mb-4 p-4 md:p-6 bg-white">
+            {/* Header section with order date, number, and more details button */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 border-b border-gray-200 mb-3">
+                <div className="order-date-and-order-num mb-2 sm:mb-0">
+                    <div className="ordered-date text-sm md:text-base text-gray-600">Requested on {String(new Date(order?.orderDate).getMonth() + 1).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getDate()).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getFullYear())}</div>
+                    <div className="order-number text-xs md:text-sm text-gray-500">
+                        Order <span className="text-[#1A9CB7] cursor-pointer hover:text-[#127F90]" onClick={handleButton}>#{order.orderId}</span>
                     </div>
-                    <div className="border-b-[1.5px]" />
-                    {order?.products.map((product, index) => (
-                        <div key={index} className="order-item w-[880px] mx-auto py-[14px] flex">
-                            <div className="item w-[400px] h-[100px] flex gap-[15px]">
-                                <div className="img w-[80px] h-[80px] items-center justify-center flex">
-                                    <img src={product.image} alt="product-image" />
-                                </div>
-                                <div className="desc">
-                                    <div className="title h-[32px]">{product.name}</div>
-                                    <div className="add-info text-[#bbb]">{product?.color ? `Color: ${product?.color}` : product?.size ? `Size: ${product?.size}` : ""}</div>
-                                </div>
-                            </div>
-                            <div className="Quantity w-[180px]"><span className="text-[#757575]">Qty : </span>{product.quantity}</div>
-                            <div className="status rounded-[100px] bg-[#ecf0f7] text-[14px] py-[4px] px-[12px] h-[32px] ">{order.orderStatus}</div>
-                        </div>
-                    ))}
                 </div>
-            </td>
-        </>
-    )
+                {/* More Details button */}
+                <span className="text-sm md:text-base text-[#DB4444] hover:text-[#A33737] cursor-pointer" onClick={handleButton}>MORE DETAILS</span>
+            </div>
+
+            {/* Products within this return */}
+            {order?.products.map((product, index) => (
+                <div key={index} className="order-item flex flex-col sm:flex-row items-start sm:items-center py-4 border-b border-gray-100 last:border-b-0">
+                    {/* Product Image and Description */}
+                    <div className="item w-full sm:w-1/2 flex gap-4 items-center mb-4 sm:mb-0">
+                        <div className="img w-20 h-20 flex items-center justify-center flex-shrink-0 bg-gray-50 rounded-md overflow-hidden">
+                            <img
+                                src={product.image || `https://placehold.co/80x80/E0E0E0/000000?text=Product`}
+                                alt="product-image"
+                                className="w-full h-full object-contain"
+                                onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/80x80/E0E0E0/000000?text=Error"; }}
+                            />
+                        </div>
+                        <div className="desc flex flex-col">
+                            <div className="title text-base md:text-lg font-medium mb-1">{product.name}</div>
+                            <div className="add-info text-xs md:text-sm text-gray-500">
+                                {product?.color && `Color: ${product?.color}`}
+                                {product?.color && product?.size && ` | `}
+                                {product?.size && `Size: ${product?.size}`}
+                            </div>
+                            {order?.orderStatus === 'Returned' || order?.orderStatus === 'Cancelled' ? (
+                                <div className="reason text-xs md:text-sm text-gray-500 mt-1">Reason: {order?.reason}</div>
+                            ) : null}
+                        </div>
+                    </div>
+                    {/* Quantity and Status */}
+                    <div className="flex flex-col sm:flex-row sm:w-1/2 justify-between items-start sm:items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
+                        <div className="Quantity text-sm md:text-base text-gray-700 w-full sm:w-1/2 text-left sm:text-center">
+                            <span className="text-gray-500">Qty : </span>{product.quantity}
+                        </div>
+                        <div className="status rounded-full bg-[#ecf0f7] text-sm md:text-base py-1 px-4 text-gray-800 w-full sm:w-auto text-left sm:text-right">
+                            {order.orderStatus}
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
 }
 
 export default Cancel_ReturnOrderRow;

@@ -30,7 +30,7 @@ const CartProductRow = ({ product, cartItemID, qty, updateQuantity, color, size,
         updateQuantity(cartItemID, quantity);
     };
     return (
-        <tr className=" py-6 px-8  shadow">
+        <tr className=" py-6 px-8 shadow">
             {loading && <td className="w-screen flex items-center justify-center"><Loader /></td>}
             <td className="grid grid-cols-4 items-center">
                 <div className={`product ${loading ? "hidden" : "flex"} items-center`}>

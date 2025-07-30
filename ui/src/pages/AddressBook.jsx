@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import AddressBookRow from '../components/AddressBookRow'
 import Aside from '../components/Aside'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import { getSavedAddresses, setDefaultBillingAddress, setDefaultShippingAddress } from '../slices/addressSlice'
 
 const AddressBook = () => {
-    const { user } = useSelector(state => state.user)
+    const { user } = useSelector(state => state.auth)
     const { savedAddresses, loading, error } = useSelector(state => state.address)
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -16,20 +16,17 @@ const AddressBook = () => {
     const [isDefaultBillingAddressClicked, setIsDefaultBillingAddressClicked] = useState(false)
     const [selectedAddress, setSelectedAddress] = useState(null);
     useEffect(() => {
-        dispatch(getSavedAddresses())
-    }, [dispatch])
-    useEffect(() => {
         if (!user) {
             navigate("/login", { state: { from: location.pathname } })
         }
     }, [user])
     const handleButtonClick = async () => {
         if (isDefaultBillingAddressClicked) {
-            await dispatch(setDefaultBillingAddress({ addressID: selectedAddress })).unwrap();
+            await dispatch(setDefaultBillingAddress({ addressId: selectedAddress })).unwrap();
             await dispatch(getSavedAddresses()).unwrap()
             setIsDefaultBillingAddressClicked(false);
         } else if (isDefaultShippingAddressClicked) {
-            await dispatch(setDefaultShippingAddress({ addressID: selectedAddress })).unwrap();
+            await dispatch(setDefaultShippingAddress({ addressId: selectedAddress })).unwrap();
             await dispatch(getSavedAddresses()).unwrap()
             setIsDefaultShippingAddressClicked(false);
         } else {
@@ -46,65 +43,89 @@ const AddressBook = () => {
         <div>
             {loading && <Loader />}
             <div className={`${loading ? "hidden" : ""}`}>
+                {/* Breadcrumbs - Made responsive with fluid width, padding, and adjusted text sizes */}
                 {/* Breadcrumbs */}
-                <div className="nav w-[1170px] h-[21px] my-[34px] mx-auto flex justify-between">
-                    <div className="bread-crumb">
-                        <a href="../pages/index.html" className="text-[#605f5f] text-[14px] hover:text-black">Home</a><span className="m-[11px] text-[14px] text-[#605f5f]">/</span><a href="../pages/manage-my-account.html" className="text-[#605f5f] text-[14px] hover:text-black">My Account</a><span className="m-[11px] text-[14px] text-[#605f5f]">/</span><a href="#" className="text-[14px]">Address Book</a>
+                <div className="nav w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto h-auto my-4 md:my-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div className="bread-crumb flex items-center mb-2 sm:mb-0">
+                        <Link to="/" className="text-[#605f5f] text-sm hover:text-black">Home</Link>
+                        <span className="mx-2 text-sm text-[#605f5f]">/</span>
+                        <Link to="/manage-my-account" className="text-[#605f5f] text-sm hover:text-black">My Account</Link>
+                        <span className="mx-2 text-sm text-[#605f5f]">/</span>
+                        <Link to="/address-book" className="text-sm">Address Book</Link>
                     </div>
-                    <div className="welcome h-[21px]">
-                        <h6 className="text-[14px]">Welcome! <span className="text-[#DB4444]">{user?.fullName}</span></h6>
+                    <div className="welcome h-auto text-sm">
+                        <h6>Welcome! <span className="text-[#DB4444]">{user?.fullName}</span></h6>
                     </div>
                 </div>
                 {/* Breadcrumbs Ends Here*/}
-                <section className="w-[1170px]  mx-auto mb-[120px] flex justify-between">
-                    <Aside setActive='address-book' />
-                    <div className="address-book w-[900px]">
-                        <div className="heading  mb-[9px] flex justify-between">
-                            <span className="text-[25px] font-400">Address Book</span>
-                            <div className={`items-center gap-[13px] ${savedAddresses && savedAddresses?.length != 0 ? "flex" : "hidden"}`}>
-                                <span className="text-[12px] text-[#DB4444] cursor-pointer hover:text-[#A33737]" onClick={() => { setIsDefaultShippingAddressClicked(true); setIsDefaultBillingAddressClicked(false) }}>Make default shipping address</span>
-                                <span>|</span>
-                                <span className="text-[12px] text-[#DB4444] cursor-pointer hover:text-[#A33737]" onClick={() => { setIsDefaultBillingAddressClicked(true); setIsDefaultShippingAddressClicked(false) }}>Make default billing address</span>
+                {/* Breadcrumbs Ends Here*/}
+
+                <section className="w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto mb-10 md:mb-16 flex flex-col lg:flex-row lg:gap-10">
+
+                    <div className="address-book w-full">
+                        <div className="heading flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6">
+                            <span className="text-xl md:text-2xl font-semibold">Address Book</span>
+                            <div className={`flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mt-4 sm:mt-0 ${savedAddresses && savedAddresses?.length !== 0 ? "flex" : "hidden"}`}>
+                                <span
+                                    className="text-xs md:text-sm text-[#DB4444] cursor-pointer hover:text-[#A33737]"
+                                    onClick={() => { setIsDefaultShippingAddressClicked(true); setIsDefaultBillingAddressClicked(false); }}
+                                >
+                                    Make default shipping address
+                                </span>
+                                <span className="hidden sm:inline-block">|</span>
+                                <span
+                                    className="text-xs md:text-sm text-[#DB4444] cursor-pointer hover:text-[#A33737]"
+                                    onClick={() => { setIsDefaultBillingAddressClicked(true); setIsDefaultShippingAddressClicked(false); }}
+                                >
+                                    Make default billing address
+                                </span>
                             </div>
                         </div>
-                        <table>
-                            <thead className="w-[900px] h-[50px] flex items-center shadow">
-                                <tr className="w-[850px] mx-auto flex justify-between">
-                                    <th className="font-normal">Full Name</th>
-                                    <th className="font-normal">Address</th>
-                                    <th className="font-normal">Postcode</th>
-                                    <th className="font-normal">Phone Number</th>
-                                    <th />
-                                    <th />
-                                </tr>
-                            </thead>
-                            <tbody className="flex flex-col w-[900px]">
-                                {savedAddresses && savedAddresses.map((address) => (
-                                    <AddressBookRow
-                                        key={address._id}
-                                        address={address}
-                                        isClick={isDefaultBillingAddressClicked || isDefaultShippingAddressClicked}
-                                        selectedAddress={selectedAddress}
-                                        onSelect={handleSelectedAddress}
-                                        onEdit={handleEditAddress}
-                                    />
-                                ))}
-                                {!savedAddresses || savedAddresses?.length === 0 ? (
-                                    <tr className="w-[900px] p-[15px] h-[46px] flex items-center mx-auto shadow justify-center text-[#A6A6A6]">
-                                        <td colSpan="6" className="text-center">No Address Found</td>
-                                    </tr>
-                                ) : ""}
-                            </tbody>
-                        </table>
-                        <div className={`flex justify-end mt-[14px] `}>
-                            <button className="bg-[#DB4444] text-white w-[214px] h-[56px]" onClick={handleButtonClick}>{isDefaultBillingAddressClicked || isDefaultShippingAddressClicked ? "SAVE" : "ADD NEW ADDRESS"}</button>
+
+                        <div className="overflow-x-auto w-full"> {/* Added overflow for small screens */}
+                            {/* Responsive header for desktop */}
+                            <div className="hidden md:grid grid-cols-5 gap-2 w-full bg-gray-50 p-2 rounded font-medium text-gray-700 text-sm md:text-base">
+                                <span>Full Name</span>
+                                <span>Address</span>
+                                <span>Phone Number</span>
+                                <span>Default Status</span>
+                                <span className="text-right">Actions</span>
+                            </div>
+                            {/* Address List */}
+                            <div className="flex flex-col gap-3 w-full">
+                                {savedAddresses && savedAddresses.length > 0 ? (
+                                    savedAddresses.map((address) => (
+                                        <AddressBookRow
+                                            key={address._id}
+                                            address={address}
+                                            isClick={isDefaultBillingAddressClicked || isDefaultShippingAddressClicked}
+                                            selectedAddress={selectedAddress}
+                                            onSelect={handleSelectedAddress}
+                                            onEdit={handleEditAddress}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="w-full p-4 flex items-center justify-center text-[#A6A6A6] text-center bg-gray-50 rounded shadow">
+                                        No Address Found
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center sm:justify-end mt-6">
+                            <button
+                                className={`bg-[#DB4444] text-white py-3 px-8 rounded-sm text-base font-semibold hover:bg-[#E07575] transition-colors duration-200 w-full sm:w-[214px]`}
+                                onClick={handleButtonClick}
+                                disabled={(isDefaultBillingAddressClicked || isDefaultShippingAddressClicked) && !selectedAddress} // Disable save if no address is selected
+                            >
+                                {isDefaultBillingAddressClicked || isDefaultShippingAddressClicked ? "SAVE" : "ADD NEW ADDRESS"}
+                            </button>
                         </div>
                     </div>
                 </section>
             </div>
-
         </div>
-    )
+    );
 }
 
 export default AddressBook

@@ -1,116 +1,224 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react';
+import { Send, Facebook, Twitter, Instagram, Linkedin, MapPin, Mail, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
+    const [email, setEmail] = useState('');
+
+    const handleEmailSubmit = (e) => {
+        e.preventDefault();
+        console.log('Email submitted:', email);
+        setEmail('');
+    };
+
     return (
         <div className='font-inter'>
-            <footer className="bg-black text-white h-max py-4">
-                {/* Main Footer Starts Here */}
-                <div className="main-footer w-[73rem] h-max grid grid-cols-5 m-auto gap-5">
-                    {/* Col-1 Starts Here  */}
-                    <div className="col-1">
-                        <div className="heading my-3">
-                            <p className=" text-2xl font-bold">Exclusive</p>
-                        </div>
-                        <ul>
-                            <li className="text-[20px]">Subscribe</li>
-                            <li className="my-3">Get 10% off your order</li>
-                            <li>
-                                <div className="emailSubscribe  bg-black  flex items-center border-2 border-white rounded-sm text-white py-2 w-max px-2">
-                                    <input type="email" name="subscribeEmail" autoComplete="off" id="email" placeholder="Enter Your Email" className="bg-black  border-0 focus:outline-none focus:border-0 w-44" />
-                                    <svg stroke="currentColor" fill="currentColor" strokeWidth={0} viewBox="0 0 16 16" className="text-color-primary w-6 h-6 text-lg cursor-pointer max-2xl:w-5 max-2xl:h-5" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M1 1.91L1.78 1.5L15 7.44899V8.3999L1.78 14.33L1 13.91L2.58311 8L1 1.91ZM3.6118 8.5L2.33037 13.1295L13.5 7.8999L2.33037 2.83859L3.6118 7.43874L9 7.5V8.5H3.6118Z" /></svg>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    {/* Col-1 End Here  */}
-                    {/* Col-2 Starts Here  */}
-                    <div className="col-2">
-                        <div className="heading my-3">
-                            <p className="text-[20px]">Support</p>
-                        </div>
-                        <ul className="flex flex-col gap-3">
-                            <li><Link to="https://www.google.com/maps/search/?api=1&query=111+Bijoy+Sarani,+Dhaka,+DH+1515,+Bangladesh" className="text-[16px] hover:text-[#c1c0bf]">111 Bijoy Sarani, Dhaka, DH 1515, Bangladesh</Link></li>
-                            <li><Link to="mailto:exclusive@gmail.com" className="hover:text-[#c1c0bf]">exclusive@gmail.com</Link></li>
-                            <li><Link to="tel:+88015-88888-9999" className="hover:text-[#c1c0bf]">+88015-88888-9999</Link></li>
-                        </ul>
-                    </div>
-                    {/* Col-2 Ends Here  */}
-                    {/* Col-3 Starts Here  */}
-                    <div className="col-3">
-                        <div className="heading my-3">
-                            <p className="text-[20px]">Account</p>
-                        </div>
-                        <ul className="flex flex-col gap-2">
-                            <li><Link to="/manage-my-account" className="hover:text-[#c1c0bf]">My Account</Link></li>
-                            <li><Link to="/signup" className="hover:text-[#c1c0bf]">Login/Register</Link></li>
-                            <li><Link to="/cart" className="hover:text-[#c1c0bf]">Cart</Link></li>
-                            <li><Link to="/wishlist" className="hover:text-[#c1c0bf]">Wishlist</Link></li>
-                            <li><Link to="/" className="hover:text-[#c1c0bf]">Shop</Link></li>
-                        </ul>
-                    </div>
-                    {/* Col-3 Ends Here  */}
-                    {/* Col-4 Starts Here  */}
-                    <div className="col-4 ">
-                        <div className="heading my-3">
-                            <p className="text-[20px]">Quick Link</p>
-                        </div>
-                        <ul className="flex flex-col gap-2">
-                            <li><Link to="/privacy-policy" className="hover:text-[#c1c0bf]">Privacy Policy</Link></li>
-                            <li><Link to="/terms-of-use" className="hover:text-[#c1c0bf]">Terms Of Use</Link></li>
-                            <li><Link to="/faq" className="hover:text-[#c1c0bf]">FAQ</Link></li>
-                            <li><Link to="/contact" className="hover:text-[#c1c0bf]">Contact</Link></li>
-                        </ul>
-                    </div>
-                    {/* Col-4 Ends Here  */}
-                    {/* Col-5 Starts Here  */}
-                    <div className="col-5">
-                        <div className="heading my-3">
-                            <p className="text-[20px]">Download App</p>
-                        </div>
-                        <ul className="flex flex-col gap-3">
-                            <li className=" text-[13px]">Save $3 with App New User Only</li>
-                            <li className="">
-                                <div className="grid grid-cols-2 w-48">
-                                    <div className="">
-                                        <img src="/images/Qr Code.png" alt="qrcode" className=""/>
-                                    </div>
-                                    <div className="flex flex-col items-center">
-                                        <img src="/images/google-store-badge.png" alt="google-store-badge" className="" />
-                                        <img src="/images/apple-store-badge.png" alt="apple-store-badge" className=" border-[1px] border-[#9A9A9A] rounded-md w-[6.5rem] " />
+            <footer className="bg-black text-white py-8 md:py-12">
+                {/* Main Footer */}
+                <div className="container mx-auto px-4 max-w-7xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-6">
+
+                        {/* Column 1 - Subscribe */}
+                        <div className="col-span-1 sm:col-span-2 md:col-span-1 lg:col-span-1">
+                            <div className="mb-6">
+                                <h3 className="text-2xl font-bold mb-4">Exclusive</h3>
+                                <h4 className="text-xl mb-4">Subscribe</h4>
+                                <p className="mb-4 text-gray-300">Get 10% off your order</p>
+
+                                <div className="">
+                                    <div className="flex items-center border-2 border-white rounded-sm bg-black">
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="Enter Your Email"
+                                            className="bg-transparent border-0 outline-none flex-1 py-2 px-3 max-w-[87%] text-white placeholder-gray-400"
+                                        />
+                                        <button
+                                            onClick={handleEmailSubmit}
+                                            className=" hover:bg-gray-800 transition-colors rounded-r-sm"
+                                        >
+                                            <Send size={20} className="text-white" />
+                                        </button>
                                     </div>
                                 </div>
-                            </li>
-                            <li>
-                                <div className="social-icons flex items-center gap-9 ">
-                                    <a href="https://www.facebook.com/exclusive" target="_blank" rel="noopener noreferrer">
-                                        <img src="/images/facebook.svg" alt="Facebook" className="w-5 h-5" />
+                            </div>
+                        </div>
+
+                        {/* Column 2 - Support */}
+                        <div className="col-span-1">
+                            <div className="mb-6">
+                                <h4 className="text-xl mb-4">Support</h4>
+                                <ul className="space-y-3">
+                                    <li>
+                                        <a
+                                            href="https://www.google.com/maps/search/?api=1&query=111+Bijoy+Sarani,+Dhaka,+DH+1515,+Bangladesh"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-gray-300 hover:text-white transition-colors flex items-start gap-2"
+                                        >
+                                            <MapPin size={16} className="mt-1 flex-shrink-0" />
+                                            <span className="text-sm md:text-base">111 Bijoy Sarani, Dhaka, DH 1515, Bangladesh</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            href="mailto:exclusive@gmail.com"
+                                            className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+                                        >
+                                            <Mail size={16} />
+                                            <span>exclusive@gmail.com</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            href="tel:+88015-88888-9999"
+                                            className="text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+                                        >
+                                            <Phone size={16} />
+                                            <span>+88015-88888-9999</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Column 3 - Account */}
+                        <div className="col-span-1">
+                            <div className="mb-6">
+                                <h4 className="text-xl mb-4">Account</h4>
+                                <ul className="space-y-2">
+                                    <li>
+                                        <Link to="/manage-my-account" className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+                                            My Account
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/login" className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+                                            Login/Register
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/cart" className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+                                            Cart
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/wishlist" className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+                                            Wishlist
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/" className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+                                            Shop
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Column 4 - Quick Links */}
+                        <div className="col-span-1">
+                            <div className="mb-6">
+                                <h4 className="text-xl mb-4">Quick Link</h4>
+                                <ul className="space-y-2">
+                                    <li>
+                                        <Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+                                            Privacy Policy
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/terms-of-use" className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+                                            Terms Of Use
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/faq" className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+                                            FAQ
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/contact" className="text-gray-300 hover:text-white transition-colors cursor-pointer">
+                                            Contact
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Column 5 - Download App */}
+                        <div className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1">
+                            <div className="mb-6">
+                                <h4 className="text-xl mb-4">Download App</h4>
+                                <p className="text-sm text-gray-300 mb-4">Save $3 with App New User Only</p>
+
+                                {/* QR Code and App Store Badges */}
+                                <div className="flex flex-col sm:flex-row lg:flex-col items-start gap-4 mb-6">
+                                    <div className="flex gap-4 items-center">
+                                        {/* QR Code Placeholder */}
+                                        <div className="w-20 h-20  flex items-center justify-center">
+                                            <img src="/images/Qr Code.png" alt="qr-code" className="object-cover" />
+                                        </div>
+
+                                        {/* App Store Badges */}
+                                        <div className="flex flex-col gap-2">
+                                            <img src="/images/google-store-badge.png" alt="google-badge" className='w-32 h-14 object-cover' />
+                                            <img src="/images/apple-store-badge.png" alt="apple-badge" className='w-32 h-10 object-cover border-[0.1px] border-[#A4A3A3] rounded-md' />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Social Media Icons */}
+                                <div className="flex items-center gap-6">
+                                    <a
+                                        href="https://www.facebook.com/exclusive"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                    >
+                                        <Facebook size={20} />
                                     </a>
-                                    <a href="https://www.x.com/exclusive" target="_blank" rel="noopener noreferrer">
-                                        <img src="/images/x.svg" alt="X" className="w-5 h-5" />
+                                    <a
+                                        href="https://www.x.com/exclusive"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                    >
+                                        <Twitter size={20} />
                                     </a>
-                                    <a href="https://www.instagram.com/exclusive" target="_blank" rel="noopener noreferrer">
-                                        <img src="/images/insta.svg" alt="Instagram" className="w-5 h-5" />
+                                    <a
+                                        href="https://www.instagram.com/exclusive"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                    >
+                                        <Instagram size={20} />
                                     </a>
-                                    <a href="https://www.linkedin.com/exclusive" target="_blank" rel="noopener noreferrer">
-                                        <img src="/images/Icon-Linkedin.svg" alt="Linkedin" className="w-5 h-5" />
+                                    <a
+                                        href="https://www.linkedin.com/exclusive"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                    >
+                                        <Linkedin size={20} />
                                     </a>
                                 </div>
-                            </li>
-                        </ul>
+                            </div>
+                        </div>
                     </div>
-                    {/* Col-5 Ends Here  */}
                 </div>
-                {/* Main Footer Ends Here */}
-                {/* Sub Footer Starts Here */}
-                <div className="sub-footer flex flex-col mt-9 gap-5">
-                    <div className="border-t " />
-                    <p className="text-[16px] text-center text-[#2e2e2e]">© Copyright Exclusive 2024. All rights reserved.</p>
+
+                {/* Sub Footer */}
+                <div className="border-t border-gray-800 mt-8 pt-6">
+                    <div className="container mx-auto px-4">
+                        <p className="text-center text-gray-500 text-sm md:text-base">
+                            © Copyright Exclusive 2025. All rights reserved.
+                        </p>
+                    </div>
                 </div>
-                {/* Sub Footer Ends Here */}
             </footer>
         </div>
-    )
-}
+    );
+};
 
-export default Footer
+export default Footer;

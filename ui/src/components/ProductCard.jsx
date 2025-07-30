@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product, onWishlistToggle, onCartClick, isWishlistSelected, isAddToCartSelected }) => {
+    console.log(product?.effectiveDiscount ? Math.round(calculateDiscountPrice(product.price, product.effectiveDiscount)) : null);
     const [wishlistHovered, setWishlistHovered] = useState(false);
     const [cartHovered, setCartHovered] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,8 +43,8 @@ const ProductCard = ({ product, onWishlistToggle, onCartClick, isWishlistSelecte
             {isModalOpen && <ProductModal product={product} onClose={closeModal} action={actionToPerform} />}
             <div className=" w-full flex flex-col justify-between h-full ">
                 <div className="relative">
-                    <div className={`${product.stock === 0 ? "bg-[#DB4444]" : product.new ? "bg-[#00FF66]" : product.discount > 0 ? "bg-[#DB4444]" : "hidden"} absolute top-2 left-2 text-white text-xs px-2 py-1 rounded`}>
-                        {product.stock === 0 ? "Out Of Stock" : product.new ? "NEW" : `- ${product.discount}%`}
+                    <div className={`${product.stock === 0 ? "bg-[#DB4444]" : product.new ? "bg-[#00FF66]" : product.discount > 0 || product?.effectiveDiscount > 0 ? "bg-[#DB4444]" : "hidden"} absolute top-2 left-2 text-white text-xs px-2 py-1 rounded`}>
+                        {product.stock === 0 ? "Out Of Stock" : product.new ? "NEW" : product?.effectiveDiscount > 0 ? `- ${product?.effectiveDiscount}%` : `- ${product.discount}%`}
                     </div>
                     <div
                         className="absolute top-2 right-2 bg-white rounded-full p-2 cursor-pointer"
@@ -63,13 +64,13 @@ const ProductCard = ({ product, onWishlistToggle, onCartClick, isWishlistSelecte
 
                 <div className="mt-auto flex items-center justify-between pt-2">
                     <div className="price flex gap-3 items-center">
-                        {product.discount > 0 && (
+                        {(product.discount > 0 || product?.effectiveDiscount > 0) && (
                             <p className="text-[#DB4444] font-semibold text-[16px]">
-                                ${Math.round(calculateDiscountPrice(product.price, product.discount))}
+                                ${product?.effectiveDiscount > 0 ? Math.round(calculateDiscountPrice(product.price, product.effectiveDiscount)) : Math.round(calculateDiscountPrice(product.price, product.discount))}
                             </p>
                         )}
-                        <p className={`text-sm ${product.discount > 0 ? "text-[#888888]" : "text-[#DB4444] font-semibold"}`}>
-                            {product.discount > 0 ? <del>${product.price}</del> : <span>${product.price}</span>}
+                        <p className={`text-sm ${product.discount > 0 || product?.effectiveDiscount > 0 ? "text-[#888888]" : "text-[#DB4444] font-semibold"}`}>
+                            {product.discount > 0 || product?.effectiveDiscount > 0 ? <del>${product.price}</del> : <span>${product.price}</span>}
                         </p>
                     </div>
                 </div>

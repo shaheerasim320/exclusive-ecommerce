@@ -65,72 +65,47 @@ const RelatedItems = ({ title }) => {
     ];
 
     const handleWishlistToggle = async (isAdded, productID, quantity = 1, color = null, size = null) => {
-        // if (isAdded || wishlist.find(item => item.productID == productID)) {
-        //     try {
-        //         await dispatch(removeFromWishlist({ productID: productID })).unwrap()
-        //         await dispatch(getWishlistItems()).unwrap()
-        //         toast.success("Product removed from wishlist")
-        //     } catch (error) {
-        //         toast.error(wishlistError)
-        //     }
-        // } else {
-        //     try {
-        //         await dispatch(addItemToWishlist({ productID, quantity, color, size })).unwrap()
-        //         await dispatch(getWishlistItems()).unwrap()
-        //         toast.success("Product added to wishlist")
-        //     } catch (error) {
-        //         toast.error(wishlistError)
-        //     }
-        // }
+        // Wishlist toggle logic (commented)
     }
 
     const handleAddToCartClick = async (productID, quantity = 1, color = null, size = null) => {
-        // if (cart.find(item => item.productID == productID)) {
-        //     return
-        // }
-        // try {
-        //     await dispatch(addItemToCart({ productID, quantity, color, size })).unwrap()
-        //     await dispatch(getCartItems()).unwrap()
-        //     toast.success("Product added to cart")
-        // } catch (error) {
-        //     toast.error(cartError)
-        // }
+        // Add to cart logic (commented)
     }
 
     return (
         <div>
             {/* For You */}
-            <div className="flex flex-col gap-4  w-[1170px] h-max m-auto my-8">
+            <div className="flex flex-col gap-4 max-w-6xl w-full h-max m-auto my-8">
                 {/* Header */}
-                <div className="header flex  items-center justify-between">
-                    {/* Title */}
-                    <div className="heading flex gap-4  items-center">
-                        <div className="rectangle w-5 h-10  bg-[#db4444]" />
+                <div className="header flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="heading flex gap-4 items-center">
+                        <div className="rectangle w-5 h-10 bg-[#db4444]" />
                         <div className="text">
                             <p className="text-[16px] font-semibold text-[#db4444]">{title}</p>
                         </div>
                     </div>
-                    {/* Title Ends Here */}
-                    {/* Button */}
-                    <div className={`btn w-[150px] h-[56px] bg-slate-500 ${title != 'Just For You' ? 'hidden' : ''}`}>
-                        <button className="bg-white w-[150px] h-[56px] rounded-sm border-[1.5px] border-black border-opacity-60 hover:border-opacity-30">See All</button>
+                    <div className={`btn w-full sm:w-[150px] h-[56px] ${title !== 'Just For You' ? 'hidden' : ''}`}>
+                        <button className="bg-white w-full h-full rounded-sm border-[1.5px] border-black border-opacity-60 hover:border-opacity-30">See All</button>
                     </div>
-                    {/* Button Ends Here */}
                 </div>
-                {/* Header Ends Here */}
                 {/* Products */}
                 <div className="products grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-stretch">
                     {products.map((product) => (
                         <div key={product.id}>
-                            <ProductCard product={product} key={product._id} onWishlistToggle={handleWishlistToggle} onCartClick={handleAddToCartClick} isWishlistSelected={items.some(item => item.product == product._id)} isAddToCartSelected={cart != null && cart.find(item => item.productID == product._id)} />
+                            <ProductCard
+                                product={product}
+                                key={product._id}
+                                onWishlistToggle={handleWishlistToggle}
+                                onCartClick={handleAddToCartClick}
+                                isWishlistSelected={items.some(item => item.product == product._id)}
+                                isAddToCartSelected={cart != null && cart.find(item => item.productID == product._id)}
+                            />
                         </div>
                     ))}
                 </div>
-                {/* Products End Here */}
             </div>
-            {/* For You Ends Here */}
         </div>
     )
 }
 
-export default RelatedItems
+export default RelatedItems;

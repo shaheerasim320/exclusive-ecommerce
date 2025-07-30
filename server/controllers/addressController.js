@@ -150,16 +150,17 @@ const updateAddress = async (req, res) => {
     try {
         const {
             addressId,
-            name,
-            phoneNumber,
-            address,
-            city,
-            province,
-            country,
-            defaultBillingAddress,
-            defaultShippingAddress,
+            updatedData: {
+                name,
+                phoneNumber,
+                address,
+                city,
+                province,
+                country
+            }
         } = req.body;
-
+        console.log(req.body);
+        console.log(address);
         if (!addressId) {
             return res.status(400).json({ message: "Address ID is required" });
         }
@@ -181,7 +182,7 @@ const updateAddress = async (req, res) => {
         if (isAdmin && req.body.userId && req.body.userId !== addressToUpdate.user.toString()) {
             return res.status(400).json({ message: "Address-user mismatch" });
         }
-
+        console.log(`Name: ${name}, Phone Number: ${phoneNumber} , Address: ${address} , City: ${city} , Province ${province} Country: ${country}`)
         // ✅ Perform updates
         addressToUpdate.name = name || addressToUpdate.name;
         addressToUpdate.phoneNumber = phoneNumber || addressToUpdate.phoneNumber;
@@ -189,9 +190,7 @@ const updateAddress = async (req, res) => {
         addressToUpdate.city = city || addressToUpdate.city;
         addressToUpdate.province = province || addressToUpdate.province;
         addressToUpdate.country = country || addressToUpdate.country;
-        addressToUpdate.defaultBillingAddress = defaultBillingAddress ?? addressToUpdate.defaultBillingAddress;
-        addressToUpdate.defaultShippingAddress = defaultShippingAddress ?? addressToUpdate.defaultShippingAddress;
-
+        console.log(addressToUpdate);
         await addressToUpdate.save();
 
         res.status(200).json({ message: "Address updated successfully" });

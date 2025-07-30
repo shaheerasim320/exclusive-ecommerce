@@ -4,7 +4,7 @@ import Coupon from "../models/Coupon.js";
 
 export const getCartItems = async (req, res) => {
     try {
-        const query = req.user?._id ? { user: req.user._id } : { guestId: req.guestId };
+        const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
         const cart = await Cart.findOne(query).populate("items.product");
         res.status(200).json(cart?.items || []);
     } catch (error) {
@@ -13,11 +13,22 @@ export const getCartItems = async (req, res) => {
     }
 };
 
+export const getGuestCartItems = async (req, res) => {
+    const guestId = req.guestId;
+    try {
+        const cart = await Cart.findOne({ guestId }).populate("items.product");
+        res.status(200).json({ items: cart?.items || [] });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Server error, please try again" });
+    }
+}
+
 export const addToCart = async (req, res) => {
     const { product, quantity, color, size } = req.body;
 
     try {
-        const query = req.user?._id ? { user: req.user._id } : { guestId: req.guestId };
+        const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
 
         let cart = await Cart.findOne(query);
         if (!cart) cart = await Cart.create(query);
@@ -46,7 +57,7 @@ export const addToCart = async (req, res) => {
 export const removeFromCart = async (req, res) => {
     const { cartItemId } = req.body;
     try {
-        const query = req.user?._id ? { user: req.user._id } : { guestId: req.guestId };
+        const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
         await Cart.updateOne(
             query,
             { $pull: { items: { _id: cartItemId } } }
@@ -60,27 +71,50 @@ export const removeFromCart = async (req, res) => {
 }
 
 export const mergeCart = async (req, res) => {
-    const guestItems = req.body.guestItems;
+    const guestId = req.guestId;
+    const userId = req.user?.userId
+    const { mergeOptions } = req.body;
+
     try {
-        const cart = await Cart.findOne({ user: req.user.userId });
-        if (!cart) cart = new Cart({ user: req.user.userId, items: [] });
-        for (const guestItem of guestItems) {
-            const index = cart.items.findIndex(item =>
-                item.product == guestItem.product && item.color == guestItem.color && item.size == guestItem.size
-            )
-            if (index > -1) {
-                cart.items[index].quantity += guestItem.quantity;
-            } else {
-                cart.items.push(guestItem);
-            }
+        console.log(guestId);
+        console.log(userId);
+        console.log(mergeOptions);
+        const guestCart = await Cart.findOne({ guestId });
+        const userCart = await Cart.findOne({ user: userId });
+        console.log(userCart);
+        console.log(guestCart);
+        if (!guestCart && !userCart) {
+            return res.status(404).json({ message: "No cart found for guest or user" });
         }
-        await cart.save();
-        res.status(200).json({ items: cart.items });
+        if (mergeOptions === "cart") {
+
+            guestCart.items.forEach(guestItem => {
+                const existingIndex = userCart.items.findIndex(item =>
+                    item.product == guestItem.product &&
+                    item.color == guestItem.color &&
+                    item.size == guestItem.size
+                );
+
+                if (existingIndex > -1) {
+                    userCart.items[existingIndex].quantity += guestItem.quantity;
+                } else {
+                    userCart.items.push(guestItem);
+                }
+            });
+
+            await userCart.save();
+
+            await Cart.findOneAndDelete({ guestId });
+
+            const updatedCart = await userCart.populate("items.product");
+            console.log(updatedCart);
+            res.status(200).json({ message: "Cart merged successfully", cart: updatedCart.items });
+        }
     } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ message: "Server error, please try again" });
+        console.error(error);
+        res.status(500).json({ message: "Error merging cart data" });
     }
-}
+};
 
 
 export const updateProductQuantity = async (req, res) => {
@@ -90,7 +124,7 @@ export const updateProductQuantity = async (req, res) => {
         if (!cartItemId || quantity <= 0) {
             return res.status(400).json({ message: "Invalid input data" });
         }
-        const query = req.user?._id ? { user: req.user._id } : { guestId: req.guestId };
+        const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
 
         const cart = await Cart.findOne(query);
         if (!cart) return res.status(404).json({ message: "Cart not found for this user" });
@@ -115,9 +149,9 @@ export const updateProductQuantity = async (req, res) => {
 
 const applyCoupon = async (req, res) => {
     const { couponCode } = req.body;
-    const userID = req.user.userId
+    const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
     try {
-        const cart = await Cart.findOne({ user: userID });
+        const cart = await Cart.findOne(query);
         if (!cart) {
             return res.status(404).json({ message: "Unable to find cart" });
         }
@@ -127,7 +161,7 @@ const applyCoupon = async (req, res) => {
         }
         cart.coupon = coupon._id;
         await cart.save();
-        res.status(200).json({ message: "Coupon code applied successfully" });
+        res.status(200).json(coupon);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -167,13 +201,10 @@ const getCartItemByProductID = async (req, res) => {
 
 
 const getAppliedCoupon = async (req, res) => {
-    const userID = req.user.userId
+    const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
     try {
-        const cart = await Cart.findOne({ user: userID }).populate("coupon")
-        if (!cart) {
-            return res.status(404).json({ message: "Unable to find cart" });
-        }
-        res.status(200).json(cart.coupon)
+        const cart = await Cart.findOne(query).populate("coupon");
+        res.status(200).json(cart?.coupon || null)
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -194,5 +225,32 @@ const removeCoupon = async (req, res) => {
         res.status(500).json({ message: "Error in removing coupon" })
     }
 }
+
+export const discardGuestCart = async (req, res) => {
+    try {
+        const guestId = req.guestId;
+
+        if (!guestId) {
+            return res.status(400).json({ message: "Guest ID is required" });
+        }
+
+        const guestCart = await Cart.findOne({ guestId });
+
+        if (!guestCart) {
+            return res.status(404).json({ message: "Guest cart not found" });
+        }
+
+        // Delete the cart
+        await Cart.deleteOne({ guestId });
+
+        return res.status(200).json({ message: "Guest cart discarded successfully" });
+
+    } catch (error) {
+        console.error("Error discarding guest cart:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
 
 export { applyCoupon, getCartItemByProductID, getAppliedCoupon, removeCoupon }

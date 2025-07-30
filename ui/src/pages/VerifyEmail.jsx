@@ -2,52 +2,66 @@ import React, { useEffect, useState } from 'react'
 import EmailConfirmModal from '../components/modals/EmailConfirmModal'
 import ErrorModal from '../components/modals/ErrorModal'
 import Loader from '../components/Loader'
-import axios from 'axios'
-import { verifyUser, resetError } from '../slices/userSlice'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import api from '../api/axiosInstance'
 
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  const token  = searchParams.get("token")
-  const { sucess, error, loading } = useSelector((state) => state.user)
-  const [showErrorModal,setShowErrorModal] = useState(false)
-  const [showEmailConfirmModal,setShowEmailConfirmModal] = useState(false)
-  useEffect(()=>{
-    dispatch(verifyUser(token))
-  },[token])
-  const handleClose = () =>{
+  const token = searchParams.get("token")
+  const [showLoader, setShowLoader] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [error, setError] = useState("")
+  const [showEmailConfirmModal, setShowEmailConfirmModal] = useState(false)
+
+  useEffect(() => {
+    const verify = async () => {
+      try {
+        setShowLoader(true);
+        const response = await api.post(`/users/verify/${token}`);
+        console.log(response);
+        if (response?.status == 200) {
+          setShowEmailConfirmModal(true);
+        }
+      } catch (err) {
+        console.log(err.response.data.message);
+       setError(err?.response?.data?.message || "An error occurred. Please try again.");
+      }finally{
+        setShowLoader(false);
+      }
+    };
+    if (token) {
+      verify();
+    } else {
+      navigate("/p404")
+    }
+  }, [token]);
+
+
+  const handleClose = () => {
     setShowErrorModal(false)
-    
-    dispatch(resetError())
-    navigate("/resend-link")
+    navigate("/resend-link", { state: { fromVerificationFail: true } });
   }
-  useEffect(()=>{
-    if(error!=null){
-      setShowErrorModal(true)
-    }
-  },[error])
-  useEffect(()=>{
-    if(sucess==true){
-      setShowEmailConfirmModal(true)
-    }
-  },[sucess])
-  const handleLoginPageClick = () =>{
+
+  const handleLoginPageClick = () => {
     setShowEmailConfirmModal(false)
-    dispatch(resetError())
-    dispatch(resetSucess())
     navigate("/login")
   }
   return (
-    <div className='min-h-[400px]'>
-      {showEmailConfirmModal && <EmailConfirmModal onClick={()=>handleLoginPageClick()}/>}
-      {showErrorModal&& <ErrorModal message={error} btnMessage={"Resend Verification Email"} onClose={()=>handleClose()}/>}
-      {loading?<Loader/>:""}
+    <div className="min-h-screen flex items-center justify-center px-4">
+      {showEmailConfirmModal && <EmailConfirmModal onClick={handleLoginPageClick} />}
+      {error!="" && (
+        <ErrorModal
+          message={error}
+          btnMessage="Resend Verification Email"
+          onClose={handleClose}
+        />
+      )}
+      {showLoader && <div className="flex justify-center"><Loader /></div>}
     </div>
-  )
+  );
+
 }
 
 export default VerifyEmail

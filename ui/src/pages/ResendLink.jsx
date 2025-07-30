@@ -1,93 +1,129 @@
-import React, { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import EmailSentModal from '../components/modals/EmailSentModal';
 import ErrorModal from '../components/modals/ErrorModal';
-import { useDispatch, useSelector } from 'react-redux';
-import Loader from '../components/Loader';
-import { resendToken } from '../slices/userSlice';
 
-const ResendLink = () => {
-    const dispatch = useDispatch()
-    const { sucess, error, loading } = useSelector((state) => state.user)
-    const [showErrorModal,setShowErrorModal] = useState(false)
-    const [showEmailModal,setShowEmailModal] = useState(false)
-    const [showLoader,setShowLoader] = useState(false)
-    const [formData, setFormData] = useState({
-        email: ""
-    })
-    const [errors, setErrors] = useState({
-        email: ""
-    })
-    const validateEmail = (email) => {
-        const emailRegex = /^[a-zA-Z][a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return emailRegex.test(email);
-    };
-    const handleClick = () =>{
-        if(errors.email==""){
-            dispatch(resendToken(formData.email))
-        }
+export default function ResendVerificationLink() {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showEmailSentModal, setShowEmailSentModal] = useState(false);
+  const [name, setName] = useState("");
+  const [error, setError] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!location.state?.fromVerificationFail) {
+      navigate("/p404");
     }
-    const handleErrorClose = () =>{
-        setShowErrorModal(false)
-        setFormData({email:""})
+  }, [location.state, navigate]);
+
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isValidEmail = (email) => emailRegex.test(email);
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsSubmitting(true);
+
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address.");
+      setIsSubmitting(false);
+      return;
     }
-    const handleSucessModalClose = () =>{
-        setShowEmailModal(false)
-        setFormData({email:""})
+
+    try {
+      const response = await axios.post("http://localhost:8080/api/v1/users/resend-token", { email });
+      if (response?.status == 200) {
+        setName(response.data.name);
+        setShowEmailSentModal(true);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
-    const handleResendMail = () =>{
-            dispatch(resendToken(formData.email))
-        }
-    useEffect(()=>{
-        if(error!=null){
-            setShowErrorModal(true)
-        }
-    },[error])
-    useEffect(()=>{
-        if(sucess==true){
-            setShowEmailModal(true)
-        }
-    },[sucess])
-    useEffect(()=>{
-            if(loading==true){
-                setShowLoader(true)
-                setShowEmailModal(false)
-                setShowErrorModal(false)
-            }if(loading==false){
-                setShowLoader(false)
-                if(sucess==true){
-                    setShowEmailModal(true)
-                }
-            }
-        },[loading])
-    return (
-        <div className="min-h-[320px]">
-            {showErrorModal && <ErrorModal message={error} btnMessage={"Retry"} onClose={()=>handleErrorClose()}/>}
-            {showLoader && <Loader />}
-            {showEmailModal &&<EmailSentModal name={"user"} onClose={()=>handleSucessModalClose()} onResend={()=>handleResendMail()}/>}
-            <div className={`w-[1150px] mt-[16px] mb-[115px] ${showErrorModal || loading?"hidden":"flex"} gap-[129px]`}>
-                <div className="image w-[805px] h-[446px] bg-[#CBE4E8]">
-                    <img src="/images/dl.beatsnoop 1.png" alt="image" className="mt-[75px]" />
-                </div>
-                <div className="form w-[371px] h-[326px] my-[183px] flex flex-col gap-[48px]">
-                    <div className="heading-content h-[78px]">
-                        <h2 className="text-[32px] font-semibold">Request New Link</h2>
-                        <p className="text-[16px]">Enter your details below</p>
-                    </div>
-                    <div className="form-content h-[104px] flex flex-col gap-[40px]">
-                        <div className="fields h-[176px] flex flex-col gap-[46px]">
-                            <div className="flex flex-col h-[24px]">
-                                <input type="email" placeholder="Email" className="w-[370px] h-[24px] border-b-[1.5px] focus:outline-none focus:border-[#DB4444]" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} onBlur={() => setErrors({ ...errors, email: (formData.email === "" ? "Empty Field" : !validateEmail(formData.email) ? "Invalid Email Address" : "") })} onFocus={() => setErrors({ ...errors, email: "" })} />
-                                <span className={`left-[349px] bottom-[24px] w-[21px] ${errors.email == "" ? "hidden" : "relative"}`} title={errors.email}><img src="/images/error-icon.png" alt="error-icon" width={20} height={20} /></span>
-                            </div>
-                        </div>
-                        <div className="buttons  flex justify-center">
-                            <button className="bg-[#DB4444] hover:bg-[#E07575] text-white rounded-sm py-[11px] px-[16px]" onClick={()=>handleClick()}>Get New Link</button>
-                        </div>
-                    </div>
-                </div>
+  };
+
+  const handleResendClick = async () => {
+    try {
+      const response = await axios.post("http://localhost:8080/api/v1/users/resend-token", { email });
+      if (response?.status == 200) {
+        setShowEmailSentModal(true);
+      }
+    } catch (error) {
+      setErrorMessage(error.response?.data?.message || 'An error occurred. Please try again.');
+    }
+  }
+
+  const handleCloseClick = () => {
+    setShowEmailSentModal(false);
+    navigate("/");
+  }
+
+  const handleErrorModalClose = () => {
+    if(error=="Your email is already verified. Please log in instead."){
+      setError("")
+      navigate("/login")
+    }else{
+      setError("");
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      {showEmailSentModal && <EmailSentModal name={name} onClose={handleCloseClick} onResend={handleResendClick} />}
+      {error != "" && error != "Please enter a valid email address." && <ErrorModal message={error} btnMessage={error == "Your email is already verified. Please log in instead." ? "Log in" : "Retry"} onClose={handleErrorModalClose} />}
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-7xl w-full">
+        <div className="flex flex-col lg:flex-row min-h-[600px]">
+          <div className="lg:w-1/2 ">
+            <img
+              src="/images/dl.beatsnoop 1.png"
+              alt="BeatSnoop Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Right Side - Resend Verification Link Form */}
+          <div className="lg:w-1/2 p-8 lg:p-12 flex items-center justify-center">
+            <div className="max-w-md mx-auto w-full">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">Resend Verification Link</h1>
+              <p className="text-gray-600 mb-8 text-center">
+                Enter your email to receive a new verification link.
+              </p>
+              {/* Error Message */}
+              {error!="Your email is already verified. Please log in instead." && <div className="text-red-500 text-sm my-3">{error}</div>}
+              {/* Email Form */}
+              <div className="relative mb-4">
+                <input
+                  type="email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-[#DB4444] focus:outline-none transition-colors bg-transparent pr-12"
+                  placeholder="Email"
+                  required
+                />
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className={`w-full py-3 px-4 rounded-xl font-medium transition-all duration-200 ${isSubmitting
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-[#DB4444] hover:bg-red-600 text-white'
+                  }`}
+              >
+                {isSubmitting ? "Sending..." : "Send Verification Link"}
+              </button>
+
             </div>
+          </div>
         </div>
-    )
+      </div>
+    </div>
+  );
 }
-
-export default ResendLink

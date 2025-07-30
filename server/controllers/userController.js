@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs"
 import axios from "axios"
 import Counter from "../models/Counter.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/tokenUtils.js";
+import Wishlist from "../models/Wishlist.js";
 
 dotenv.config()
 
@@ -23,9 +24,9 @@ export const registerUser = async (req, res) => {
         const user = new User({ fullName, email, password: hashedPassword, phoneNumber, gender, status: "unverified", custID })
         const savedUser = await user.save()
         const cart = new Cart({ user: savedUser._id })
-        const savedCart = await cart.save()
-        savedUser.cart = savedCart._id
-        await savedUser.save()
+        await cart.save()
+        const wishlist = new Wishlist({ user: savedUser._id })
+        await wishlist.save();
         const token = jwt.sign(
             { userId: savedUser._id },
             process.env.JWT_SECRET,
@@ -77,21 +78,11 @@ export const registerUser = async (req, res) => {
             }
         )
         res.status(201).json({
-            message: "User registered. Please check your email to verify your account.",
+            name: fullName
         })
     } catch (error) {
-        let errorMessage = "User validation failed. Please check your details.";
-
-        if (error.message.includes('email')) {
-            errorMessage = "User validation failed: Email is invalid or already in use. Please check your details.";
-        } else if (error.message.includes('phoneNumber')) {
-            errorMessage = "User validation failed: Phone number is invalid. Please check your details.";
-        } else if (error.message.includes('password')) {
-            errorMessage = "User validation failed: Password must meet the required criteria. Please check your details.";
-        } else if (error.message.includes('gender')) {
-            errorMessage = "User validation failed: Gender is required. Please check your details.";
-        }
-        res.status(400).json({ message: errorMessage });
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -184,8 +175,8 @@ export const addCustomer = async (req, res) => {
         res.status(201).json({ message: "Customer created. An email has been sent to set their password." });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Something went wrong while creating the customer." });
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -203,11 +194,8 @@ export const setPassword = async (req, res) => {
         }
         res.status(200).json({ message: "User verified successfully" });
     } catch (error) {
-        if (error.name === "TokenExpiredError") {
-            return res.status(401).json({ message: "Token has expired" });
-        } else {
-            return res.status(400).json({ message: "Invalid token" });
-        }
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -226,11 +214,8 @@ export const verifyUser = async (req, res) => {
         res.status(200).json({ message: "User verified successfully" });
 
     } catch (error) {
-        if (error.name === "TokenExpiredError") {
-            return res.status(401).json({ message: "Token has expired" });
-        } else {
-            return res.status(400).json({ message: "Invalid token" });
-        }
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -244,6 +229,9 @@ export const resendToken = async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
+        }
+        if (user.status == "verified") {
+            return res.status(400).json({ message: "Your email is already verified. Please log in instead." });
         }
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "30m" });
@@ -311,11 +299,11 @@ export const resendToken = async (req, res) => {
             }
         );
 
-        res.status(200).json({ message: "A new link has been sent to your email address." });
+        res.status(200).json({ name: user?.fullName });
 
     } catch (error) {
-        console.error("Resend token error:", error);
-        res.status(500).json({ message: "Failed to send email. Please try again." });
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 
@@ -327,9 +315,10 @@ export const login = async (req, res) => {
     try {
         const user = await User.findOne({ email: email })
         if (!user) return res.status(404).json({ message: "User not found" })
-
-        const isMatch = await bcrypt.compare(password, user.password)
-        if (!isMatch) return res.status(400).json({ message: "Incorrect password" })
+        if (user?.password) {
+            const isMatch = await bcrypt.compare(password, user.password)
+            if (!isMatch) return res.status(400).json({ message: "Incorrect password" })
+        }
 
         if (user.status == "unverified") return res.status(403).json({ message: "User is not verified" })
 
@@ -353,7 +342,8 @@ export const login = async (req, res) => {
             accessToken
         })
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -366,8 +356,9 @@ export const refreshAccessToken = (req, res) => {
         const newAccessToken = generateAccessToken(decoded.userId);
 
         return res.status(200).json({ accessToken: newAccessToken })
-    } catch (err) {
-        return res.status(403).json({ message: "Invalid or expired refresh token" });
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 export const logout = (req, res) => {
@@ -379,33 +370,36 @@ export const logout = (req, res) => {
 };
 
 export const refreshUser = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) return res.status(401).json({ message: "No refresh token" });
     try {
-        const user = await User.findById(req.user.userId).select("-password -createdAt -updatedAt");
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+        const newAccessToken = generateAccessToken(decoded.userId);
+        const user = await User.findById(decoded.userId).select("-password -createdAt -updatedAt");
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        const newAccessToken = jwt.sign({ userId: req.user.userId }, process.env.JWT_SECRET, { expiresIn: "1h" });
-
-        res.cookie("accessToken", newAccessToken, {
-            httpOnly: true,
-            maxAge: 3600000,
-            sameSite: "Lax",
-        });
-
         res.status(200).json({
+            accessToken: newAccessToken,
             message: "User session refreshed",
             user
         });
     } catch (error) {
-        res.status(401).json({ message: "Invalid token, please log in again." });
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
 export const updateProfile = async (req, res) => {
-    const userID = req.user.userId;
+    const userID = req.user?.userId;  // Check if userId exists
+
     let hashedPassword = "";
+
+    if (!userID) {
+        return res.status(400).json({ message: "User ID is missing" });
+    }
 
     try {
         const user = await User.findById(userID);
@@ -413,7 +407,7 @@ export const updateProfile = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if (req.body.currentPassword != "" && req.body.newPassword != "") {
+        if (req.body.currentPassword && req.body.newPassword) {
             const isMatch = await bcrypt.compare(req.body.currentPassword, user.password);
             if (!isMatch) {
                 return res.status(400).json({ message: "Current password is incorrect" });
@@ -423,7 +417,7 @@ export const updateProfile = async (req, res) => {
                 return res.status(400).json({ message: "New password and confirmation password do not match" });
             }
             if (req.body.currentPassword === req.body.newPassword) {
-                return res.status(400).json({ message: "New password is similar to current password" })
+                return res.status(400).json({ message: "New password is similar to current password" });
             }
             hashedPassword = await bcrypt.hash(req.body.newPassword, 10);
             user.password = hashedPassword;
@@ -436,10 +430,11 @@ export const updateProfile = async (req, res) => {
         await user.save();
         res.status(200).json({ message: "Profile updated successfully", user });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ message: "Error in updating user profile" });
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 export const getAllCustomers = async (req, res) => {
     try {
@@ -447,9 +442,20 @@ export const getAllCustomers = async (req, res) => {
         res.status(200).json(customers)
 
     } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ message: "Error in fetching customers" });
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const getUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select("-password");
+        res.status(200).json({ user });
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 
 

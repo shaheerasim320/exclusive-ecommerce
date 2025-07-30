@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 const billingSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    guestId: { type: String },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    publicId: { type: String, required: true, unique: true, index: true },
     status: { type: String, enum: ["pending", "completed"], default: "pending" },
     items: [
         {
@@ -12,8 +12,12 @@ const billingSchema = new mongoose.Schema({
             size: { type: String, default: null }
         }
     ],
-    coupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon", default: null },
-}, { timestamps: true });
+    coupon: {
+        type: mongoose.Schema.Types.ObjectId, ref: "Coupon", default: null
+    },
+}, {
+    timestamps: true
+});
 
 const Billing = mongoose.model("Billing", billingSchema);
 

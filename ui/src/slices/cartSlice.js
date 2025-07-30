@@ -1,5 +1,5 @@
 import api from "../api/axiosInstance";
-import { createSlice, createAsyncThunk, isPending, isRejected, isFulfilled } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { calculateDiscountPrice } from "../functions/DiscountPriceCalculator";
 
 export const fetchCart = createAsyncThunk("cart/fetch", async (_, { rejectWithValue }) => {
@@ -21,7 +21,7 @@ export const addToCart = createAsyncThunk("cart/add", async ({ product, quantity
     }
 });
 
-export const removeFromCart = createAsyncThunk("cart/remove", async ({ cartItemId }, { getState }) => {
+export const removeFromCart = createAsyncThunk("cart/remove", async ({ cartItemId }, { rejectWithValue }) => {
     try {
         const res = await api.delete("/cart/remove", { data: { cartItemId } });
         return res.data.items;
@@ -30,12 +30,14 @@ export const removeFromCart = createAsyncThunk("cart/remove", async ({ cartItemI
     }
 });
 
-export const syncCart = createAsyncThunk("cart/sync", async (_, { getState }) => {
-    const guestItems = getState().cart.items;
-    const res = await api.post("/cart/merge", { guestItems });
-    return res.data.items;
-})
-
+export const syncCart = createAsyncThunk("cart/sync", async (mergeOptions, { rejectWithValue }) => {
+    try {
+        const res = await api.post("/cart/merge-cart", { mergeOptions });
+        return res.data.cart;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to sync cart");
+    }
+});
 
 export const updateProductQuantity = createAsyncThunk(
     "cart/updateProductQuantity", async ({ cartItemId, quantity }, { rejectWithValue }) => {
@@ -43,97 +45,58 @@ export const updateProductQuantity = createAsyncThunk(
             const res = await api.post("/cart/update-product-quantity", { cartItemId, quantity });
             return res.data.items;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to delete from wishlist");
+            return rejectWithValue(error.response?.data?.message || "Failed to update product quantity");
         }
     }
 );
 
-
-
 export const getCartItemByProductID = createAsyncThunk(
     "cart/getCartItemByProductID",
-    async ({ productID, quantity, color, size }, { rejectWithValue, dispatch }) => {
+    async ({ productID, quantity, color, size }, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/v1/cart/cartItem?productID=${productID}&quantity=${quantity}&color=${color}&size=${size}`, { withCredentials: true })
-            return response.data
+            const response = await api.get(`/cart/cartItem?productID=${productID}&quantity=${quantity}&color=${color}&size=${size}`);
+            return response.data;
         } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    // await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.get(`http://localhost:8080/api/v1/cart/cartItem?productID=${productID}&quantity=${quantity}&color=${color}&size=${size}`, { withCredentials: true })
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
             return rejectWithValue(error.response?.data?.message || "Failed to Fetch Cart Item");
         }
     }
-)
+);
 
 export const applyCoupon = createAsyncThunk(
     "cart/applyCoupon",
-    async ({ couponCode }, { rejectWithValue, dispatch }) => {
+    async ({ couponCode }, { rejectWithValue }) => {
         try {
-            const response = await axios.post("http://localhost:8080/api/v1/cart/apply-coupon", { couponCode }, { withCredentials: true })
-            return response.data
+            const response = await api.post("/cart/apply-coupon", { couponCode });
+            return response.data;
         } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    // await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.post("http://localhost:8080/api/v1/cart/apply-coupon", { couponCode }, { withCredentials: true })
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
             return rejectWithValue(error.response?.data?.message || "Failed to apply coupon");
         }
     }
-)
-
+);
 
 export const getAppliedCoupon = createAsyncThunk(
     "cart/getAppliedCoupon",
-    async (_, { rejectWithValue, dispatch }) => {
+    async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get("http://localhost:8080/api/v1/cart/get-applied-coupon", { withCredentials: true })
-            return response.data
+            const response = await api.get("/cart/get-applied-coupon");
+            return response.data;
         } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    // await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.get("http://localhost:8080/api/v1/cart/get-applied-coupon", { withCredentials: true })
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
             return rejectWithValue(error.response?.data?.message || "Failed to check coupon applied status");
         }
     }
-)
+);
 
 export const removeCoupon = createAsyncThunk(
-    "cart/removeCart",
-    async (_, { rejectWithValue, dispatch }) => {
+    "cart/removeCoupon",
+    async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.delete("http://localhost:8080/api/v1/cart/remove-coupon", { withCredentials: true });
-            return response.data
+            const response = await api.delete("/cart/remove-coupon");
+            return response.data;
         } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    // await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.delete("http://localhost:8080/api/v1/cart/remove-coupon", { withCredentials: true });
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
             return rejectWithValue(error.response?.data?.message || "Failed to remove coupon");
         }
     }
-)
+);
 
 const calculateSubtotal = (cartItems) => {
     return cartItems.reduce((total, item) => {
@@ -142,10 +105,9 @@ const calculateSubtotal = (cartItems) => {
     }, 0);
 };
 
-
 const calculateCouponDiscountAmount = (coupon, subtotal) => {
     return !coupon ? 0 : coupon?.discountType == "fixed" ? coupon?.discountValue : (coupon.discountValue / 100) * subtotal;
-}
+};
 
 const updateTotals = (state) => {
     const subtotal = calculateSubtotal(state.items);
@@ -155,86 +117,100 @@ const updateTotals = (state) => {
     state.subtotal = subtotal;
     state.couponDiscount = couponDiscount;
     state.total = total;
-}
-
+};
 
 const initialState = {
     items: [],
     error: null,
-    status: "idle",
     loading: false,
     coupon: null,
     subtotal: 0,
     couponDiscount: 0,
-    total: 0
+    total: 0,
+    cartItem: null
 };
 
 const cartSlice = createSlice({
     name: "cart",
     initialState,
+    reducers: {
+        clearCartError: (state) => {
+            state.error = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
+            .addCase(fetchCart.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(fetchCart.fulfilled, (state, action) => {
+                state.loading = false;
                 state.items = action.payload;
                 updateTotals(state);
-                state.status = "succeeded"
             })
+            .addCase(fetchCart.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
             .addCase(addToCart.fulfilled, (state, action) => {
                 state.items = action.payload;
                 updateTotals(state);
-                state.status = "succeeded"
+                state.loading = false;
             })
             .addCase(removeFromCart.fulfilled, (state, action) => {
                 state.items = action.payload;
                 updateTotals(state);
-                state.status = "succedded";
+                state.loading = false;
             })
             .addCase(syncCart.fulfilled, (state, action) => {
                 state.items = action.payload;
                 localStorage.removeItem("guest_cart");
+                updateTotals(state);
+                state.loading = false;
             })
             .addCase(updateProductQuantity.fulfilled, (state, action) => {
                 state.items = action.payload;
                 updateTotals(state);
-                state.status = "succedded";
+                state.loading = false;
             })
-
             .addCase(getCartItemByProductID.fulfilled, (state, action) => {
                 state.loading = false;
-                state.error = null;
                 state.cartItem = action.payload;
+                state.error = null;
             })
             .addCase(getAppliedCoupon.fulfilled, (state, action) => {
-                state.loading = false
-                state.error = null
-                state.coupon = action.payload
+                state.loading = false;
+                state.coupon = action.payload;
+                updateTotals(state);
             })
-
+            .addCase(applyCoupon.fulfilled, (state, action) => {
+                state.loading = false;
+                state.coupon = action.payload;
+                updateTotals(state);
+            })
+            .addCase(removeCoupon.fulfilled, (state) => {
+                state.loading = false;
+                state.coupon = null;
+                updateTotals(state);
+            })
             .addMatcher(
-                (action) => isPending(getAppliedCoupon, applyCoupon, getCartItemByProductID, removeCoupon)(action),
+                (action) => [getAppliedCoupon.pending.type, applyCoupon.pending.type, getCartItemByProductID.pending.type, removeCoupon.pending.type].includes(action.type),
                 (state) => {
                     state.loading = true;
                     state.error = null;
                 }
             )
-
             .addMatcher(
-                (action) => isRejected(getAppliedCoupon, applyCoupon, getCartItemByProductID, removeCoupon)(action),
+                (action) => [getAppliedCoupon.rejected.type, applyCoupon.rejected.type, getCartItemByProductID.rejected.type, removeCoupon.rejected.type].includes(action.type),
                 (state, action) => {
                     state.loading = false;
-                    state.error = action.payload;
+                    state.error = action.payload || action.error.message;
                 }
-            )
-
-            .addMatcher(
-                (action) => isFulfilled(applyCoupon, removeCoupon)(action),
-                (state) => {
-                    state.loading = false;
-                    state.error = null;
-                }
-            )
-
-    },
+            );
+    }
 });
 
+export const { clearCartError } = cartSlice.actions;
 export default cartSlice.reducer;

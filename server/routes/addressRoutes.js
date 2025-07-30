@@ -8,7 +8,7 @@ router.post("/set-default-billing-address",setDefaultBillingAddress)
 router.get("/get-default-shipping-address",getDefaultShippingAddress)
 router.get("/get-default-billing-address",getDefaultBillingAddress)
 router.get("/get-user-addresses",getUserAddresses)
-router.post("/update-address",updateAddress)
+router.put("/update-address",updateAddress)
 router.get("/get-address-by-id/:addressID",getAddressByID)
 
 

@@ -9,23 +9,17 @@ export const calculateSubtotal = (items, order = false) => {
     }, 0);
     return subtotal
 }
-export const calculateCouponAmount = async (couponID, price = 0) => {
-    if (!couponID) return 0; 
+export const calculateCouponAmount = (coupon, price = 0) => {
 
-    try {
-        const { data: coupon } = await axios.get(`http://localhost:8080/api/v1/coupons/coupon/${couponID}`);
 
-        if (!coupon) return 0;  
 
-        if (coupon.discountType === 'fixed') {
-            return coupon.discountValue;  
-        } else if (coupon.discountType === 'percentage') {
-            return (coupon.discountValue / 100) * price;
-        } else {
-            return 0; 
-        }
-    } catch (error) {
-        console.error("Error fetching coupon details:", error);
+    if (!coupon) return 0;
+
+    if (coupon.discountType === 'fixed') {
+        return coupon.discountValue;
+    } else if (coupon.discountType === 'percentage') {
+        return (coupon.discountValue / 100) * price;
+    } else {
         return 0;
     }
 };

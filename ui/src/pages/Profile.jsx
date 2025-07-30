@@ -1,75 +1,80 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Aside from '../components/Aside'
 import { useSelector } from 'react-redux'
 
 const Profile = () => {
-    const { user } = useSelector(state => state.user)
-    const location = useLocation()
-    const navigate = useNavigate()
-    useEffect(() => {
-        if (!user) {
-            navigate("/login", { state: { from: location.pathname } })
-        }
-    }, [user])
-    return (
-        <div>
+  const { user } = useSelector(state => state.auth)
+  const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    if (!user) {
+      navigate("/login", { state: { from: location.pathname } })
+    }
+  }, [user])
+  return (
+    <div className="w-full">
+      {/* Breadcrumbs */}
+      <div className="nav w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto h-auto my-4 md:my-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+        <div className="bread-crumb flex items-center mb-2 sm:mb-0">
+          <Link to="/" className="text-[#605f5f] text-sm hover:text-black">Home</Link>
+          <span className="mx-2 text-sm text-[#605f5f]">/</span>
+          <Link to="/manage-my-account" className="text-[#605f5f] text-sm hover:text-black">My Account</Link>
+          <span className="mx-2 text-sm text-[#605f5f]">/</span>
+          <Link to="/my-profile" className="text-sm">My Profile</Link>
+        </div>
+        <div className="welcome h-auto text-sm">
+          <h6>Welcome! <span className="text-[#DB4444]">{user?.fullName}</span></h6>
+        </div>
+      </div>
+      {/* Breadcrumbs Ends Here*/}
+
+      <section className="w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto mb-10 md:mb-16 flex flex-col lg:flex-row lg:gap-10">
+        {/* <Aside setActive="my-profile" /> */}
+
+        <div className="flex-1 bg-white shadow-md rounded-lg p-6 md:p-10">
+          <h5 className="text-xl text-[#DB4444] font-semibold mb-6">My Profile</h5>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-                {/* Breadcrumbs */}
-                <div className="nav w-[1170px] h-[21px] my-[34px] mx-auto flex justify-between">
-                    <div className="bread-crumb">
-                        <Link to="/" className="text-[#605f5f] text-[14px] hover:text-black">Home</Link><span className="m-[11px] text-[14px] text-[#605f5f]">/</span><Link to="/manage-my-account" className="text-[#605f5f] text-[14px] hover:text-black">My Account</Link><span className="m-[11px] text-[14px] text-[#605f5f]">/</span><Link to="/my-profile" className="text-[14px]">My Profile</Link>
-                    </div>
-                    <div className="welcome h-[21px]">
-                        <h6 className="text-[14px]">Welcome! <span className="text-[#DB4444]">{user?.fullName}</span></h6>
-                    </div>
-                </div>
-                {/* Breadcrumbs Ends Here*/}
-                <section className="w-[1170px] h-[430px] mx-auto mb-[120px] flex justify-between">
-                    <Aside setActive='my-profile' />
-                    <div className="profile w-[870px] h-[450px] p-[70px] shadow-lg">
-                        <div className="inner h-[350px] flex flex-col justify-between">
-                            <div className="heading mb-[8px]">
-                                <h5 className="text-[20px] text-[#DB4444]">My Profile</h5>
-                            </div>
-                            <div className="row-1 flex justify-between">
-                                <div className="name w-[341px] h-[78px] flex flex-col">
-                                    <span className="text-[12px] text-[#424242] mb-1">Full Name</span>
-                                    <div className="name-text">{user?.fullName}</div>
-                                </div>
-                                <div className="email w-[341px] h-[78px] flex flex-col">
-                                    <span className="text-[12px] text-[#424242] mb-1">Email</span>
-                                    <div className="name-text">{user?.email}</div>
-                                </div>
-                            </div>
-                            <div className="row-2 flex justify-between">
-                                <div className="phone w-[341px] h-[78px] flex flex-col">
-                                    <span className="text-[12px] text-[#424242] mb-1">Mobile</span>
-                                    <div className="phone-text">{"+" + user?.phoneNumber}</div>
-                                </div>
-                                <div className="gender w-[341px] h-[78px] flex flex-col">
-                                    <span className="text-[12px] text-[#424242] mb-1">Gender</span>
-                                    <div className="gender-text">{user?.gender}</div>
-                                </div>
-                            </div>
-                            <div className="row-4">
-                                <div className="password w-[341px] h-[78px] flex flex-col">
-                                    <span className="text-[12px] text-[#424242] mb-1">Password</span>
-                                    <div className="password-text">***********</div>
-                                </div>
-                            </div>
-                            <div className="row-5 ml-[518px]">
-                                <Link to="/edit-profile">
-                                    <button className="btn-1 w-[214px] h-[56px]">EDIT PROFILE</button>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+              <span className="text-xs text-gray-600 block mb-1">Full Name</span>
+              <div className="text-base">{user?.fullName}</div>
+            </div>
+            <div>
+              <span className="text-xs text-gray-600 block mb-1">Email</span>
+              <div className="text-base">{user?.email}</div>
+            </div>
+            <div>
+              <span className="text-xs text-gray-600 block mb-1">Mobile</span>
+              <div className="text-base">
+                {user?.phoneNumber ? `+${user.phoneNumber}` : "Not Provided"}
+              </div>
+            </div>
+            <div>
+              <span className="text-xs text-gray-600 block mb-1">Gender</span>
+              <div className="text-base">{user?.gender || "Not Specified"}</div>
             </div>
 
+            {/* Conditionally show Password if it exists */}
+            {user?.password && (
+              <div>
+                <span className="text-xs text-gray-600 block mb-1">Password</span>
+                <div className="text-base font-medium">***********</div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end">
+            <Link to="/edit-profile">
+              <button className="bg-[#DB4444] hover:bg-[#E07575] text-white font-medium px-6 py-3 rounded-md transition">
+                EDIT PROFILE
+              </button>
+            </Link>
+          </div>
         </div>
-    )
+      </section>
+    </div>
+  )
 }
 
 export default Profile

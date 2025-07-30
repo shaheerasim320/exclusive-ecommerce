@@ -1,110 +1,176 @@
-import React, { useEffect, useState } from 'react'
-import ErrorModal from '../components/modals/ErrorModal';
-import Loader from '../components/Loader';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import EmailConfirmModal from '../components/modals/EmailConfirmModal';
 
-const PasswordForm = () => {
-    const navigate = useNavigate()
-    const [loading, setLoading] = useState(false)
-    const [searchParams] = useSearchParams()
-    const create = searchParams.get("create")
-    const reset = searchParams.get("reset")
-    const token = searchParams.get("token")
-    const [showErrorModal, setShowErrorModal] = useState(false)
-    const [errorMessage, setErrorMessage] = useState("")
-    const [errorButtonMessage, setErrorButtonMessage] = useState("")
-    const [error, setError] = useState("")
-    const [showConfirmModal, setShowConfirmModal] = useState(false)
-    const [formData, setFormData] = useState({
-        password: "",
-        confirmPassword: ""
-    })
-    const [errors, setErrors] = useState({
-        password: "",
-        confirmPassword: ""
-    })
-    const validatePassword = (password) => {
-        const passwordRegex = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$/;
-        return passwordRegex.test(password)
+export default function ForgotPassword() {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [showPasswordFields, setShowPasswordFields] = useState(false); // Track if the token is present
+  const [formData, setFormData] = useState({
+    password: '',
+    confirmPassword: ''
+  });
+  const [token, setToken] = useState('');
+  const [isReset, setIsReset] = useState(false);
+  const [isCreate, setIsCreate] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check for token and flow type (reset or create) in the URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tokenFromUrl = params.get('token');
+    const reset = params.get('reset');
+    const create = params.get('create');
+    
+    if ((reset === 'true' || create === 'true') && !tokenFromUrl) {
+      // If both reset and create are true, but no token is provided, redirect to /p404
+      navigate('/p404');
+    } else {
+      if (tokenFromUrl) {
+        setToken(tokenFromUrl);
+        setShowPasswordFields(true); // Token present, show password reset fields
+      }
+      if (reset === 'true') {
+        setIsReset(true);
+        setIsCreate(false);
+      } else if (create === 'true') {
+        setIsCreate(true);
+        setIsReset(false);
+      }
+    }
+  }, [location, navigate]);
+
+  // Handle the email submission for password reset
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('/api/v1/users/password-reset', { email });
+      setMessage(response.data.message);
+      setError('');
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred');
+      setMessage('');
+    }
+  };
+
+  // Handle the password reset form submission
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match');
+      return;
     }
 
-    const handleClick = async () => {
-        const { password, confirmPassword } = formData;
-        const allFieldsFilled = password !== "" && confirmPassword !== "";
-
-        if (!allFieldsFilled) {
-            setError(password === "" ? "Please fill the password" : "Please fill confirm password");
-            return;
-        }
-
-        if (errors.password === "" && errors.confirmPassword === "" && create) {
-            try {
-                console.log("Sending request with:", { token, password });
-                setLoading(true);
-                const res = await axios.post("http://localhost:8080/api/v1/users/set-password", {
-                    token,
-                    password
-                });
-                setShowConfirmModal(true);
-            } catch (error) {
-                const message = error.response?.data?.message || error.message;
-                setErrorMessage(message == "Token has expired" ? "Your link has expired. Please request a new one." : "Something went wrong! Please try again");
-                setErrorButtonMessage(message == "Token has expired" ? "Request New Link" : "Retry");
-                setShowErrorModal(true)
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
-
-
-    const handleClose = () => {
-        errorMessage == "Your link has expired. Please request a new one." ? navigate("/resend-link") : window.location.reload()
-        setShowErrorModal(!showErrorModal)
+    try {
+      const response = await axios.post('/api/v1/users/reset-password', { token, password: formData.password });
+      setMessage(response.data.message);
+      setError('');
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred');
+      setMessage('');
     }
+  };
 
-    const handleConfirmModal = () => {
-        setShowConfirmModal(!showConfirmModal)
-        navigate("/login")
-    }
+  // Handle input changes for both email and password form
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-7xl w-full">
+        <div className="flex flex-col lg:flex-row min-h-[600px]">
+          <div className="lg:w-1/2 ">
+            <img
+              src="/images/dl.beatsnoop 1.png"
+              alt="BeatSnoop Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
 
-    return (
-        <div className="min-h-[320px]">
-            {loading && <Loader />}
-            {showErrorModal && <ErrorModal message={errorMessage} btnMessage={errorButtonMessage} onClose={handleClose} />}
-            {showConfirmModal && <EmailConfirmModal onClick={handleConfirmModal} account={true} />}
-            <div className={`w-[1150px] mt-[16px] mb-[115px] ${showErrorModal || loading ? "hidden" : "flex"} gap-[129px]`}>
-                <div className="image w-[805px] h-[446px] bg-[#CBE4E8]">
-                    <img src="/images/dl.beatsnoop 1.png" alt="pic" className="mt-[75px]" />
-                </div>
-                <div className="form w-[371px] h-[326px] my-[183px] flex flex-col gap-[48px]">
-                    <div className="heading-content h-[78px]">
-                        <h2 className="text-[32px] font-semibold">{reset ? "Reset Password" : "Set your password"}</h2>
-                        <p className="text-[16px]">Enter your details below</p>
-                        <p className={`text-[13px] text-[#DB4444] mt-[11px] ${error != "" ? "" : "hidden"}`}>{error}</p>
-                    </div>
-                    <div className="form-content h-[104px] flex flex-col gap-[40px]">
-                        <div className="fields h-[176px] flex flex-col gap-[46px]">
-                            <div className="flex flex-col h-[24px]">
-                                <input type="password" placeholder="Password" className="w-[370px] h-[24px] border-b-[1.5px] focus:outline-none focus:border-[#DB4444]" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} onBlur={() => setErrors({ ...errors, password: (formData.password === '' ? "Empty Field" : !validatePassword(formData.password) ? "Password must contain one upperCase letter, one lowerCase letter, one number and atleast 6 characters" : "") })} onFocus={() => { setErrors({ ...errors, password: "" }); setError(error == "Please fill password" ? "" : error) }} />
-                                <span className={`left-[349px] bottom-[24px] w-[21px] ${errors.password == "" ? "hidden" : "relative"}`} title={errors.password}><img src="/images/error-icon.png" alt="error-icon" width={20} height={20} /></span>
-                            </div>
-                            <div className="flex flex-col h-[24px]">
-                                <input type="password" placeholder="Confirm Password" className="w-[370px] h-[24px] border-b-[1.5px] focus:outline-none focus:border-[#DB4444]" value={formData.confirmPassword} onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} onBlur={() => setErrors({ ...errors, confirmPassword: (formData.confirmPassword === '' ? "Empty Field" : formData.password != formData.confirmPassword ? "Password and confirm password don't match" : "") })} onFocus={() => { setErrors({ ...errors, confirmPassword: "" }); setError(error == "Please fill confirm password" ? "" : error) }} />
-                                <span className={`left-[349px] bottom-[24px] w-[21px] ${errors.confirmPassword == "" ? "hidden" : "relative"}`} title={errors.confirmPassword}><img src="/images/error-icon.png" alt="error-icon" width={20} height={20} /></span>
-                            </div>
-                        </div>
-                        <div className="buttons  flex justify-center">
-                            <button className="bg-[#DB4444] hover:bg-[#E07575] text-white rounded-sm py-[11px] px-[16px]" onClick={handleClick}>Set Password</button>
-                        </div>
-                    </div>
-                </div>
+          {/* Right Side - Conditional Form */}
+          <div className="lg:w-1/2 p-8 lg:p-12 flex items-center justify-center">
+            <div className="max-w-md mx-auto w-full">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+                {isReset ? 'Reset Password' : isCreate ? 'Create Password' : 'Forgot Password?'}
+              </h1>
+              <p className="text-gray-600 mb-8 text-center">
+                {isReset ? 'Enter your new password to reset your account.' : isCreate ? 'Create a new password to finish your account setup.' : 'Enter your email to receive a password reset link.'}
+              </p>
+
+              {/* Email Form (if no token) */}
+              {!showPasswordFields && !isReset && !isCreate && (
+                <>
+                  <div className="relative mb-4">
+                    <input
+                      type="email"
+                      name="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-[#DB4444] focus:outline-none transition-colors bg-transparent pr-12"
+                      placeholder="Email"
+                      required
+                    />
+                  </div>
+                  <button
+                    onClick={handleEmailSubmit}
+                    className="w-full bg-[#DB4444] text-white py-3 px-4 rounded-xl font-medium hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transform hover:scale-[1.02] transition-all duration-200"
+                  >
+                    Send Reset Link
+                  </button>
+                </>
+              )}
+
+              {/* Password Form (if token is present) */}
+              {showPasswordFields && (
+                <>
+                  {/* Password Field */}
+                  <div className="relative mb-4">
+                    <input
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-[#DB4444] focus:outline-none transition-colors bg-transparent pr-12"
+                      placeholder="Password"
+                      required
+                    />
+                  </div>
+
+                  {/* Confirm Password Field */}
+                  <div className="relative mb-4">
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border-b-2 border-gray-300 focus:border-[#DB4444] focus:outline-none transition-colors bg-transparent pr-12"
+                      placeholder="Confirm Password"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    onClick={handlePasswordSubmit}
+                    className="w-full bg-[#DB4444] text-white py-3 px-4 rounded-xl font-medium hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transform hover:scale-[1.02] transition-all duration-200"
+                  >
+                    {isReset ? 'Reset Password' : 'Create Password'}
+                  </button>
+                </>
+              )}
+
+              {/* Error or Success Message */}
+              {message && <div className="text-green-500">{message}</div>}
+              {error && <div className="text-red-500">{error}</div>}
             </div>
+          </div>
         </div>
-    )
+      </div>
+    </div>
+  );
 }
-
-export default PasswordForm

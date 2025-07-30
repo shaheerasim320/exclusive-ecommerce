@@ -24,6 +24,7 @@ import { assignGuestId } from "./middlewares/assignGuestID.js";
 import cron from "node-cron"
 import cleanGuestData from "./cron/cleanGuestData.js";
 import cleanupBillings from "./cron/cleanupBillings.js";
+import cleanupExpiredFlashSales from "./cron/cleanFlashSales.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 8080
@@ -48,10 +49,15 @@ cron.schedule("0 0 * * *", () => {
     cleanGuestData();
 })
 
-cron.schedule("0 * * * *",()=>{
+cron.schedule("0 * * * *", () => {
     console.log('Running billing cleanup cron job...');
     cleanupBillings();
 })
+
+cron.schedule('* * * * *', () => {
+    console.log('Running flash sales cleanup cron job...');
+    cleanupExpiredFlashSales();
+});
 
 mongoose.connect(process.env.MONGODB_URI, { dbName: "exclusive-ecommerce" })
     .then(conn => console.log(`MongoDB Connected With Server: ${conn.connection.host}`))

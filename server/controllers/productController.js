@@ -59,9 +59,18 @@ const getBestSellingProducts = async (req, res) => {
 const getProductByProductCode = async (req, res) => {
     const { productCode, productSlug } = req.params;
     try {
-        const product = await Product.findOne({ productCode }).populate("category");
-
+        const product = await Product.findOne({ productCode }).populate("category flashSaleId");
         if (!product) return res.status(404).json({ message: "Product not found" });
+        const now = new Date();
+        const isFlashSaleActive = product.flashSaleId.isActive && new Date(product.flashSaleId.startTime)<=now && new Date(product.flashSaleId.endTime) >=now;
+        if(isFlashSaleActive){
+            const productEntry = product.flashSaleId.products.find(p=>p.product.toString()==product._id.toString())
+            if(productEntry){
+                const effectiveDiscount = productEntry.discount;
+
+            }
+        }
+        
         res.json(product);
     } catch (error) {
         console.log(error.message)
@@ -117,4 +126,24 @@ const getAllProducts = async (req, res) => {
     }
 }
 
-export { addProduct, getFlashSaleProducts, getBestSellingProducts, getProductByProductCode, getProducts, updateProduct, deleteProduct, getAllProducts };
+// Product search endpoint
+const searchProducts = async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) return res.status(400).json({ message: 'No search query provided' });
+
+        // Search by title, description, or category name (case-insensitive)
+        const products = await Product.find({
+            $or: [
+                { title: { $regex: q, $options: 'i' } },
+                { description: { $regex: q, $options: 'i' } }
+            ]
+        }).populate('category');
+
+        res.json({ products });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+};
+
+export { addProduct, getFlashSaleProducts, getBestSellingProducts, getProductByProductCode, getProducts, updateProduct, deleteProduct, getAllProducts, searchProducts };

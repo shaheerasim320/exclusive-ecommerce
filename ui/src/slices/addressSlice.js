@@ -1,100 +1,35 @@
 import { createAsyncThunk, createSlice, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit";
 import axios from "axios"
+import api from "../api/axiosInstance";
 
-export const saveAddress = createAsyncThunk(
-    "address/saveAddress",
-    async ({ name, phoneNumber, address, city, province, country, defaultBillingAddress = false, defaultShippingAddress = false }, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await axios.post(
-                "http://localhost:8080/api/v1/address/save-address",
-                { name, phoneNumber, address, city, province, country, defaultBillingAddress, defaultShippingAddress },
-                { withCredentials: true }
-            );
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.post(
-                        "http://localhost:8080/api/v1/address/save-address",
-                        { name, phoneNumber, address, city, province, country, defaultBillingAddress, defaultShippingAddress },
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    console.error("Token refresh failed:", refreshError);
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to save address"
-            );
-        }
+export const saveAddress = createAsyncThunk("address/saveAddress", async ({ name, phoneNumber, address, city, province, country, defaultBillingAddress = false, defaultShippingAddress = false }, { rejectWithValue, dispatch }) => {
+    try {
+        const response = await api.post("/address/save-address", { name, phoneNumber, address, city, province, country, defaultBillingAddress, defaultShippingAddress });
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to save address");
     }
+}
 );
 
-export const setDefaultBillingAddress = createAsyncThunk(
-    "address/setDefaultBillingAddress",
-    async ({ addressID }, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await axios.post(
-                "http://localhost:8080/api/v1/address/set-default-billing-address",
-                { addressID },
-                { withCredentials: true }
-            );
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.post(
-                        "http://localhost:8080/api/v1/address/set-default-billing-address",
-                        { addressID },
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    console.error("Token refresh failed:", refreshError);
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to set default billing address"
-            );
-        }
+export const setDefaultBillingAddress = createAsyncThunk("address/setDefaultBillingAddress", async ({ addressId }, { rejectWithValue, dispatch }) => {
+    try {
+        const response = await api.post("/address/set-default-billing-address", { addressId });
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to set default billing address");
     }
+}
 )
 
-export const setDefaultShippingAddress = createAsyncThunk(
-    "address/setDefaultShippingAddress",
-    async ({ addressID }, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await axios.post(
-                "http://localhost:8080/api/v1/address/set-default-shipping-address",
-                { addressID },
-                { withCredentials: true }
-            );
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.post(
-                        "http://localhost:8080/api/v1/address/set-default-shipping-address",
-                        { addressID },
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    console.error("Token refresh failed:", refreshError);
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to set default shipping address"
-            );
-        }
+export const setDefaultShippingAddress = createAsyncThunk("address/setDefaultShippingAddress", async ({ addressId }, { rejectWithValue, dispatch }) => {
+    try {
+        const response = await api.post("/address/set-default-shipping-address", { addressId });
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to set default shipping address");
     }
+}
 )
 
 // export const removeCard = createAsyncThunk(
@@ -161,156 +96,54 @@ export const setDefaultShippingAddress = createAsyncThunk(
 //     }
 // )
 
-export const getDefaultShippingAddress = createAsyncThunk(
-    "address/getDefaultShippingAddress",
-    async (_, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await axios.get(
-                "http://localhost:8080/api/v1/address/get-default-shipping-address",
-                { withCredentials: true }
-            );
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.get(
-                        "http://localhost:8080/api/v1/address/get-default-shipping-address",
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    console.error("Token refresh failed:", refreshError);
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to get default shipping address"
-            );
-        }
+export const getDefaultShippingAddress = createAsyncThunk("address/getDefaultShippingAddress", async (_, { rejectWithValue, dispatch }) => {
+    try {
+        const response = await api.get("/address/get-default-shipping-address");
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to get default shipping address");
     }
+}
 )
 
-export const getDefaultBillingAddress = createAsyncThunk(
-    "address/getDefaultBillingAddress",
-    async (_, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await axios.get(
-                "http://localhost:8080/api/v1/address/get-default-billing-address",
-                { withCredentials: true }
-            );
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.get(
-                        "http://localhost:8080/api/v1/address/get-default-billing-address",
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    console.error("Token refresh failed:", refreshError);
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to get default billing address"
-            );
-        }
+export const getDefaultBillingAddress = createAsyncThunk("address/getDefaultBillingAddress", async (_, { rejectWithValue, dispatch }) => {
+    try {
+        const response = await api.get("/address/get-default-billing-address",);
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to get default billing address");
     }
+}
 )
 
-export const getSavedAddresses = createAsyncThunk(
-    "card/getSavedCard",
-    async (_, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await axios.get(
-                "http://localhost:8080/api/v1/address/get-saved-addresses",
-                { withCredentials: true }
-            );
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.get(
-                        "http://localhost:8080/api/v1/address/get-saved-addresses",
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    console.error("Token refresh failed:", refreshError);
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to get saved addresses"
-            );
-        }
+export const getSavedAddresses = createAsyncThunk("address/getSavedAddresses", async (_, { rejectWithValue, dispatch }) => {
+    try {
+        const response = await api.get("/address/get-user-addresses");
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to get saved addresses");
     }
+}
 )
 
-export const getAddressByID = createAsyncThunk(
-    "card/getAddressByID",
-    async ({ addressID }, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await axios.get(
-                `http://localhost:8080/api/v1/address/get-address-by-id/${addressID}`,
-                { withCredentials: true }
-            );
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.get(
-                        `http://localhost:8080/api/v1/address/get-address-by-id/${addressID}`,
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    console.error("Token refresh failed:", refreshError);
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to get address by id"
-            );
-        }
+export const getAddressByID = createAsyncThunk("address/getAddressByID", async ({ addressID }, { rejectWithValue, dispatch }) => {
+    try {
+        const response = await api.get(`/address/get-address-by-id/${addressID}`);
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to get address by id");
     }
+}
 )
 
-export const updateUserAddress = createAsyncThunk(
-    "address/updateUserAddress",
-    async ({ id, updatedData }, { rejectWithValue, dispatch }) => {
-        try {
-            const response = await axios.post(
-                "http://localhost:8080/api/v1/address/update-address",
-                { id, updatedData },
-                { withCredentials: true }
-            );
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.get(
-                        "http://localhost:8080/api/v1/address/update-address",
-                        { id, updatedData },
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    console.error("Token refresh failed:", refreshError);
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to update address"
-            );
-        }
+export const updateUserAddress = createAsyncThunk("address/updateUserAddress", async ({ addressId, updatedData }, { rejectWithValue, dispatch }) => {
+    try {
+        const response = await api.put("/address/update-address", { addressId, updatedData },);
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to update address");
     }
+}
 )
 
 const initialState = {
@@ -339,7 +172,7 @@ const addressSlice = createSlice({
             })
             .addCase(getSavedAddresses.fulfilled, (state, action) => {
                 state.error = null
-                state.savedAddresses = action.payload
+                state.savedAddresses = action.payload.addresses
                 state.loading = false
             })
             .addCase(getAddressByID.fulfilled, (state, action) => {

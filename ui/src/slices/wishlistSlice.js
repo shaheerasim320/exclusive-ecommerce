@@ -28,21 +28,22 @@ export const removeFromWishlist = createAsyncThunk("wishlist/remove", async ({ w
     }
 })
 
-export const syncWishlist = createAsyncThunk("wishlist/sync", async (_, { getState, rejectWithValue }) => {
+export const syncWishlist = createAsyncThunk("wishlist/sync", async (mergeOptions, { rejectWithValue }) => {
     try {
-        const guestItems = getState().wishlist.items;
-        const res = await api.post("/wishlist/merge", { guestItems });
-        return res.data;
+        const res = await api.post("/wishlist/merge-wishlist", { mergeOptions });
+        return res.data.wishlist;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || "Failed to sync wishlist");
     }
-})
+});
 
 const initialState = {
-    items: [],
-    error: null,
-    status: "idle"
-}
+  items: [],
+  error: null,
+  loading: false
+};
+
+
 
 
 export const moveAllItemsToCart = createAsyncThunk(
@@ -89,52 +90,77 @@ export const addToCart = createAsyncThunk(
 )
 
 const wishlistSlice = createSlice({
-    name: "wishlist",
-    initialState,
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchWishlist.fulfilled, (state, action) => {
-                state.status = "succeeded"
-                state.items = action.payload;
-            })
-
-            .addCase(addToWishlist.fulfilled, (state, action) => {
-                state.status = "succeeded"
-                state.items = action.payload;
-            })
-
-            .addCase(removeFromWishlist.fulfilled, (state, action) => {
-                state.items = action.payload;
-                state.status = "succedded";
-            })
-
-            .addCase(syncWishlist.fulfilled, (state, action) => {
-                state.status = "succedded";
-                state.items = action.payload;
-            })
-            .addMatcher(
-                (action) => isPending(fetchWishlist, addToWishlist, removeFromWishlist, syncWishlist, moveAllItemsToCart,)(action),
-                (state) => {
-                    state.status = "loading";
-                }
-            )
-
-            .addMatcher(
-                (action) => isRejected(fetchWishlist, addToWishlist, removeFromWishlist, syncWishlist, moveAllItemsToCart,)(action),
-                (state, action) => {
-                    state.status = "failed";
-                    state.error = action.payload || action.error.message;
-                }
-            )
-
-            .addMatcher(
-                (action) => isFulfilled(removeFromWishlist, moveAllItemsToCart)(action),
-                (state) => {
-                    state.loading = false;
-                    state.error = null;
-                }
-            );
+  name: "wishlist",
+  initialState,
+  reducers: {
+    clearWishlistError: (state) => {
+      state.error = null;
     }
+  },
+  extraReducers: (builder) => {
+    builder
+
+      // -------- Fetch Wishlist --------
+      .addCase(fetchWishlist.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchWishlist.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.error = null;
+        state.loading = false;
+      })
+      .addCase(fetchWishlist.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
+      // -------- Add to Wishlist --------
+      .addCase(addToWishlist.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addToWishlist.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload;
+        state.error = null;
+      })
+      .addCase(addToWishlist.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
+      // -------- Remove from Wishlist --------
+      .addCase(removeFromWishlist.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeFromWishlist.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload;
+        state.error = null;
+      })
+      .addCase(removeFromWishlist.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+
+      // -------- Sync Wishlist --------
+      .addCase(syncWishlist.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(syncWishlist.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload;
+        state.error = null;
+      })
+      .addCase(syncWishlist.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+  }
 });
+
 
 export default wishlistSlice.reducer;

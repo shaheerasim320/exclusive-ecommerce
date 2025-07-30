@@ -1,43 +1,37 @@
-import React from 'react'
+import React from 'react';
 
-const StatsCard = ({stats}) => {
-    function valueCalculator(){
-        let value=stats.value
-        let divisor=0
-        const valuelength=(stats.value).toString().length
-        if(valuelength>4 && valuelength<=6){
-            divisor=1000
-            value=value/divisor+"k"
-        }else if(valuelength>6 && valuelength<=8){
-            divisor=100000
-            value=value/divisor+"m"
-        }else{
-            divisor=100000000
-            value=value/divisor+"t"
-        }
-        return value
+const StatsCard = ({ stats }) => {
+  function valueCalculator() {
+    let value = stats.value;
+    const valuelength = value.toString().length;
+
+    if (valuelength > 4 && valuelength <= 6) {
+      value = value / 1000 + 'k';
+    } else if (valuelength > 6 && valuelength <= 8) {
+      value = value / 100000 + 'm';
+    } else if (valuelength > 8) {
+      value = value / 100000000 + 't';
     }
-    return (
-        <div>
-            {/* Stats Card */}
-            <div className="stats-card w-[270px] h-[230px] py-[2px]  hover:text-white hover:bg-[#DB4444] group">
-                <div className="content w-[205px] h-[170px]  my-[30px] mx-auto flex flex-col items-center gap-[15px]">
-                    <div className="icon w-[80px] h-[80px] rounded-full border-[9px] bg-black group-hover:bg-white">
-                        <img src={stats.image} alt="stats" className="my-[9px] mx-auto group-hover:invert" />
-                    </div>
-                    <div className="desc flex flex-col items-center">
-                        <div className="value">
-                            <h2 className="text-[32px] font-bold">{valueCalculator()}</h2>
-                        </div>
-                        <div className="value-desc">
-                            <p className="text-[16px]">{stats.desc}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {/* Stats Card Ends*/}
-        </div>
-    )
-}
 
-export default StatsCard
+    return value;
+  }
+
+  return (
+    <div className="w-full max-w-[270px] p-4 bg-white hover:bg-[#DB4444] text-black hover:text-white transition-colors duration-300 group rounded-md shadow-sm mx-auto">
+      <div className="flex flex-col items-center gap-4">
+        {/* Icon Container */}
+        <div className="w-20 h-20 rounded-full border-[9px] bg-black group-hover:bg-white flex items-center justify-center">
+          <img src={stats.image} alt="stats icon" className="w-8 h-8 group-hover:invert" />
+        </div>
+
+        {/* Value and Description */}
+        <div className="text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold">{valueCalculator()}</h2>
+          <p className="text-sm sm:text-base">{stats.desc}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default StatsCard;

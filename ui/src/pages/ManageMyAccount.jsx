@@ -12,9 +12,9 @@ const ManageMyAccount = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const location = useLocation()
-    const { user } = useSelector(state => state.user)
+    const { user } = useSelector(state => state.auth)
     const { defaultShippingAddress, defaultBillingAddress, loading, error } = useSelector(state => state.address)
-    const { recentOrders,loading:OrderLoading } = useSelector(state => state.order)
+    const { recentOrders, loading: OrderLoading } = useSelector(state => state.order)
     useEffect(() => {
         dispatch(getDefaultBillingAddress())
         dispatch(getDefaultShippingAddress())
@@ -27,113 +27,121 @@ const ManageMyAccount = () => {
     }, [user])
     return (
         <div>
-            {(loading|| OrderLoading) && <Loader />}
+            {(loading || OrderLoading) && <Loader />} {/* Show loader when any data is loading */}
+
+            {/* Content area, hidden if loading */}
             <div className={`${(loading || OrderLoading) ? "hidden" : ""}`}>
                 {/* Breadcrumbs */}
-                <div className="nav w-[1170px] h-[21px] my-[34px] mx-auto flex justify-between">
-                    <div className="bread-crumb">
-                        <Link to="/" className="text-[#605f5f] text-[14px] hover:text-black">Home</Link><span className="m-[11px] text-[14px] text-[#605f5f]">/</span><Link to="/manage-my-account" className="text-[14px]">My Account</Link>
+                <div className="nav w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto h-auto my-4 md:my-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div className="bread-crumb flex items-center mb-2 sm:mb-0">
+                        <Link to="/" className="text-[#605f5f] text-sm hover:text-black">Home</Link>
+                        <span className="mx-2 text-sm text-[#605f5f]">/</span>
+                        <Link to="/manage-my-account" className="text-sm">My Account</Link>
                     </div>
-                    <div className="welcome h-[21px]">
-                        <h6 className="text-[14px]">Welcome! <span className="text-[#DB4444]">{user?.fullName}</span></h6>
+                    <div className="welcome h-auto text-sm">
+                        <h6>Welcome! <span className="text-[#DB4444]">{user?.fullName}</span></h6>
                     </div>
                 </div>
                 {/* Breadcrumbs Ends Here*/}
-                <section className="w-[1170px] h-[675px] mx-auto mb-[120px] flex gap-[40px]">
-                    <Aside setActive='manage-my-account' />
-                    <div className="outer-box flex flex-col gap-[40px]">
-                        <div className="manage-my-account w-[945px] h-[215px] flex gap-[35px]">
-                            <div className="personal-profile w-[300px] h-[215px] flex flex-col gap-[7px] p-[10px] shadow-md">
-                                <div className="title text-[14px] flex items-center">
-                                    <h5 className="text-[20px]">Personal Profile</h5>
-                                    <div className="border-l  h-[16px] border-black mx-[5px]" />
-                                    <span><Link to="/my-profile" className="text-[#DB4444] hover:text-[#A33737]">EDIT</Link></span>
+
+                {/* Main Content Section */}
+                <section className="w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto mb-10 md:mb-16 flex flex-col lg:flex-row lg:gap-10">
+                    
+
+                    <div className="outer-box flex flex-col gap-8 w-full lg:w-[945px]">
+                        {/* Personal Profile and Address Book */}
+                        <div className="manage-my-account w-full flex flex-col md:flex-row md:gap-8 lg:gap-[35px]">
+                            {/* Personal Profile Card */}
+                            <div className="personal-profile w-full md:w-[calc(50%-16px)] lg:w-[300px] flex flex-col gap-2 p-4 shadow-md rounded-md">
+                                <div className="title flex items-center">
+                                    <h5 className="text-xl md:text-2xl font-semibold">Personal Profile</h5>
+                                    <div className="border-l h-4 border-black mx-2" />
+                                    <span><Link to="/my-profile" className="text-[#DB4444] hover:text-[#A33737] text-sm">EDIT</Link></span>
                                 </div>
                                 <div className="name">
-                                    <h5 className="text-[18px]">{user?.fullName}</h5>
+                                    <h5 className="text-lg md:text-xl">{user?.fullName}</h5>
                                 </div>
                                 <div className="email">
-                                    <h5 className="text-[14px] text-[#767676]">{user?.email}</h5>
+                                    <h5 className="text-sm text-[#767676]">{user?.email}</h5>
                                 </div>
                             </div>
-                            <div className="address-book flex gap-[5px] w-[610px] h-[215px] shadow-md">
-                                <div className="default-shipping-address w-[300px] h-[215px] flex flex-col gap-[7px] p-[10px]">
-                                    <div className="title text-[14px] flex items-center">
-                                        <h5 className="text-[20px]">Address Book</h5>
-                                        <div className="border-l  h-[16px] border-black mx-[5px]" />
-                                        <span><Link to="/address-book" className="text-[#DB4444] hover:text-[#A33737]">EDIT</Link></span>
+
+                            {/* Address Book Section */}
+                            <div className="address-book flex flex-col sm:flex-row sm:gap-4 md:gap-2 w-full md:w-[calc(50%-16px)] lg:w-[610px] shadow-md rounded-md p-4">
+                                {/* Default Shipping Address */}
+                                <div className="default-shipping-address w-full sm:w-1/2 flex flex-col gap-2">
+                                    <div className="title flex items-center mb-2">
+                                        <h5 className="text-xl md:text-2xl font-semibold">Address Book</h5>
+                                        <div className="border-l h-4 border-black mx-2" />
+                                        <span><Link to="/address-book" className="text-[#DB4444] hover:text-[#A33737] text-sm">EDIT</Link></span>
                                     </div>
                                     <div className="name">
-                                        <h5 className="text-[12px]">DEFAULT SHIPPING ADDRESS</h5>
+                                        <h5 className="text-xs uppercase text-[#767676]">DEFAULT SHIPPING ADDRESS</h5>
                                     </div>
-                                    <div className="address flex flex-col">
-                                        {!defaultShippingAddress ? (<span className="text-[14px] text-[#767767]">No address set</span>) : (
+                                    <div className="address flex flex-col text-sm">
+                                        {!defaultShippingAddress ? (<span className="text-[#767767]">No address set</span>) : (
                                             <>
-                                                <h5 className="text-[16px] font-semibold">{defaultShippingAddress?.name}</h5>
-                                                <span className="text-[14px]">{defaultShippingAddress?.address}</span>
-                                                <span className="text-[14px]">{defaultShippingAddress?.city + " , " + defaultShippingAddress?.province + " , " + defaultShippingAddress?.country}</span>
-                                                <span className="text-[14px]">{defaultShippingAddress?.phoneNumber}</span>
+                                                <h5 className="text-base font-semibold">{defaultShippingAddress?.name}</h5>
+                                                <span>{defaultShippingAddress?.address}</span>
+                                                <span>{defaultShippingAddress?.city + " , " + defaultShippingAddress?.province + " , " + defaultShippingAddress?.country}</span>
+                                                <span>{defaultShippingAddress?.phoneNumber}</span>
                                             </>
                                         )}
                                     </div>
                                 </div>
-                                <div className="border-r h-[180px] my-[20px]" />
-                                <div className="default-billing-address w-[300px] h-[215px] flex flex-col gap-[7px] p-[10px]">
-                                    <div className="name mt-[32px]">
-                                        <h5 className="text-[12px]">DEFAULT BILLING ADDRESS</h5>
+
+                                {/* Divider for larger screens, horizontal for smaller */}
+                                <div className="hidden sm:block border-l lg:h-[180px] my-4 sm:my-0 lg:my-[20px]" />
+                                <div className="block sm:hidden border-b w-full my-4 border-gray-200" />
+
+
+                                {/* Default Billing Address */}
+                                <div className="default-billing-address w-full sm:w-1/2 flex flex-col gap-2">
+                                    <div className="name mb-2 sm:mt-[32px]"> {/* Adjusted margin for alignment */}
+                                        <h5 className="text-xs uppercase text-[#767676]">DEFAULT BILLING ADDRESS</h5>
                                     </div>
-                                    <div className="address flex flex-col">
-                                        {defaultBillingAddress == null ? (<span className="text-[14px] text-[#767767]">No address set</span>) : (
+                                    <div className="address flex flex-col text-sm">
+                                        {defaultBillingAddress == null ? (<span className="text-[#767767]">No address set</span>) : (
                                             <>
-                                                <h5 className="text-[16px] font-semibold">{defaultBillingAddress?.name}</h5>
-                                                <span className="text-[14px]">{defaultBillingAddress?.address}</span>
-                                                <span className="text-[14px]">{defaultBillingAddress?.city + " , " + defaultBillingAddress?.province + " , " + defaultBillingAddress?.country}</span>
-                                                <span className="text-[14px]">{defaultBillingAddress?.phoneNumber}</span>
+                                                <h5 className="text-base font-semibold">{defaultBillingAddress?.name}</h5>
+                                                <span>{defaultBillingAddress?.address}</span>
+                                                <span>{defaultBillingAddress?.city + " , " + defaultBillingAddress?.province + " , " + defaultBillingAddress?.country}</span>
+                                                <span>{defaultBillingAddress?.phoneNumber}</span>
                                             </>
                                         )}
-
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="orders w-[945px] h-[420px]">
-                            <div className="heading my-[14px]">
-                                <h5>Recent Orders</h5>
+
+                        {/* Recent Orders Section */}
+                        <div className="orders w-full h-auto">
+                            <div className="heading my-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                <h5 className="text-xl md:text-2xl font-semibold">Recent Orders</h5>
+                                {/* Header for desktop */}
+                                <div className="hidden sm:grid grid-cols-4 gap-2 w-full mt-4 sm:mt-0 bg-gray-50 p-2 rounded font-medium text-gray-700 text-sm md:text-base">
+                                    <span>Order #</span>
+                                    <span>Placed On</span>
+                                    <span>Items</span>
+                                    <span className="text-right">Total</span>
+                                </div>
                             </div>
-                            {/* Orders */}
-                            <table>
-                                {/* Table Head */}
-                                <thead className="w-[945px] h-[72px] flex items-center shadow">
-                                    <tr className="w-[900px] h-[24px] flex items-center justify-between mx-auto">
-                                        <th className="font-normal">Order #</th>
-                                        <th className="font-normal">Placed On</th>
-                                        <th className="font-normal">Items</th>
-                                        <th className="font-normal">Total</th>
-                                    </tr>
-                                </thead>
-                                {/* Table Body */}
-                                <tbody className="flex flex-col">
-                                    {recentOrders && recentOrders.map((order) => (
-                                        <RecentOrderRow
-                                            key={order._id}
-                                            order={order}
-                                        />
-                                    ))}
-                                    {!recentOrders || recentOrders.length === 0 ? (
-                                        <tr className="w-[945px] p-[15px] h-[55px] mx-auto flex items-center justify-center shadow">
-                                            <td colSpan="100%" className="text-center">
-                                                No orders placed yet
-                                            </td>
-                                        </tr>
-                                    ) : ""}
-                                </tbody>
-                            </table>
-                            {/* Orders End */}
+                            {/* Orders List */}
+                            <div className="flex flex-col gap-3 w-full">
+                                {recentOrders && recentOrders.length > 0 ? (
+                                    recentOrders.map((order) => (
+                                        <RecentOrderRow key={order._id} order={order} />
+                                    ))
+                                ) : (
+                                    <div className="w-full p-4 flex items-center justify-center text-center text-[#767767] text-base bg-gray-50 rounded shadow">
+                                        No orders placed yet
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </section>
             </div>
-
         </div>
     )
 }

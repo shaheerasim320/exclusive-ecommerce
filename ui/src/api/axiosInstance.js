@@ -14,7 +14,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        const state = store.getState()
+        const state = store.getState();
         const token = state.auth.accessToken;
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -24,23 +24,31 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+
 api.interceptors.response.use(
     (res) => res,
     async (error) => {
         const originalRequest = error.config;
-        if (error.response?.status == 403 && !originalRequest._retry && error.config.url != "/users/refresh-access-token") {
+
+        if (
+            error.response?.status === 403 &&
+            !originalRequest._retry &&
+            error.config.url !== "/users/refresh-access-token"
+        ) {
             originalRequest._retry = true;
             try {
-                const { accessToken } = await store.dispatch(refreshAccessToken()).unwrap()
+                const { accessToken } = await store.dispatch(refreshAccessToken()).unwrap();
                 store.dispatch();
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
-            } catch (error) {
+            } catch (refreshError) {
                 store.dispatch(logout());
-                return Promise.reject(error)
+                return Promise.reject(refreshError);
             }
         }
+        return Promise.reject(error);
     }
-)
+);
+
 
 export default api;

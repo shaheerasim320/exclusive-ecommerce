@@ -1,19 +1,26 @@
 import express from "express";
-import { registerUser, verifyUser, resendToken, login, logout, refreshUser, updateProfile, getAllCustomers, addCustomer, setPassword, refreshAccessToken } from "../controllers/userController.js"
+import { registerUser, verifyUser, resendToken, login, logout, refreshUser, updateProfile, getAllCustomers, addCustomer, setPassword, refreshAccessToken, getUser } from "../controllers/userController.js"
 import { verifyAccessToken, verifyAdmin } from "../middlewares/authMiddleware.js";
+import { googleCallback, googleLogin } from "../controllers/authGoogleController.js";
+import { mergeCart } from "../controllers/cartController.js";
+import { mergeWishlist } from "../controllers/wishlistController.js";
 
 const router = express.Router()
 
-router.post("/users", registerUser)
+router.post("/signup", registerUser)
 router.post("/verify/:token", verifyUser)
 router.post("/resend-token", resendToken)
 router.post("/login", login)
 router.post("/refresh-access-token", refreshAccessToken)
 router.post("/logout", logout)
-router.get("/refresh-user", verifyAccessToken, refreshUser)
-router.get("/get-all-customers",verifyAccessToken,verifyAdmin,getAllCustomers)
-router.post("/update-profile", verifyAccessToken, updateProfile)
-router.post("/add-customer",verifyAccessToken,verifyAdmin,addCustomer)
-router.post("/set-password",setPassword)
+router.get("/refresh-user", refreshUser)
+router.get("/get-all-customers", verifyAccessToken, verifyAdmin, getAllCustomers)
+router.put("/update-profile", verifyAccessToken, updateProfile)
+router.post("/add-customer", verifyAccessToken, verifyAdmin, addCustomer)
+router.post("/set-password", setPassword)
+router.get("/google", googleLogin)
+router.get("/google/callback", googleCallback)
+router.get("/get-user",verifyAccessToken,getUser)
+
 
 export default router

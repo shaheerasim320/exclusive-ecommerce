@@ -11,25 +11,35 @@ const RecentOrderRow = ({ order }) => {
         }
     })
     return (
-        <tr className="w-[945px] p-[15px] h-[102px] mx-auto flex items-center shadow">
-            {/* Separate td */}
-            <td className="text-[16px] w-[300px]">{order?.orderId}</td>
-            {/* Grouped tds */}
-            <td colSpan={3} className="w-[615px]">
-                {/* Container for flex layout */}
-                <div className="details flex w-full justify-between items-center">
-                    <span className="text-[16px]">{String(date.getMonth() + 1).padStart(2, "0") + "/" + String(date.getDate()).padStart(2, "0") + "/" + String(date.getFullYear())}</span>
-                    <div className="flex gap-[2px] items-center">
-                        <div className="icon w-[54px] h-[54px] flex items-center justify-center">
-                            <img src={order?.products[0].image} alt="product" />
+        // Adjusted for full width on small screens, flexible padding, and dynamic height
+        <tr className="w-full px-4 py-3 flex items-center shadow-sm border-b border-gray-200 last:border-b-0 rounded-md">
+            {/* Order ID: Responsive width */}
+            <td className="text-sm md:text-base w-1/4 break-words">
+                {order?.orderId ? `${order.orderId.substring(0, 8)}...` : 'N/A'}
+            </td>
+            {/* Grouped details: Responsive width and flex layout */}
+            <td className="w-3/4"> {/* Occupy remaining width */}
+                <div className="details flex flex-col sm:flex-row w-full justify-between items-start sm:items-center gap-2">
+                    {/* Date: Responsive font size */}
+                    <span className="text-xs sm:text-sm md:text-base">{String(new Date(order?.orderDate).getMonth() + 1).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getDate()).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getFullYear())}</span>
+                    <div className="flex gap-2 items-center">
+                        {/* Product Image: Responsive sizing and placeholder */}
+                        <div className="icon w-10 h-10 flex items-center justify-center flex-shrink-0">
+                            <img
+                                src={order?.products?.[0]?.image || "https://placehold.co/40x40/cccccc/000000?text=Product"} // Placeholder image
+                                alt="product"
+                                className="max-w-full max-h-full object-contain rounded"
+                            />
                         </div>
-                        <span className={`${order?.products.length>1?"":"hidden"} ml-[5px]`}>&amp; More</span>
+                        {/* "& More" text: Responsive visibility and margin */}
+                        <span className={`${order?.products?.length > 1 ? "" : "hidden"} text-xs sm:text-sm md:text-base ml-1`}>&amp; More</span>
                     </div>
-                    <span className="text-[16px]">${total}</span>
+                    {/* Total: Responsive font size */}
+                    <span className="text-sm md:text-base font-semibold">${total}</span>
                 </div>
             </td>
         </tr>
-    )
+    );
 }
 
 export default RecentOrderRow

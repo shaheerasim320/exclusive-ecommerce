@@ -1,67 +1,94 @@
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import PaymentCardRow from '../components/PaymentCardRow'
-import Aside from '../components/Aside'
-import { useDispatch, useSelector } from 'react-redux'
-import Loader from '../components/Loader'
-import { getSavedCards, removeCard } from '../slices/cardSlice'
+import React, { useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import PaymentCardRow from '../components/PaymentCardRow'; // This is now a div-based component
+import Aside from '../components/Aside'; // Assuming Aside is a sidebar for desktop
+import { useDispatch, useSelector } from 'react-redux';
+import Loader from '../components/Loader';
+import { getSavedCards, removeCard } from '../slices/cardSlice';
 
 const PaymentOption = () => {
-    const { user } = useSelector(state => state.user)
-    const dispatch = useDispatch()
-    const { savedCards, loading, error } = useSelector(state => state.card)
+    const navigate = useNavigate();
+    const { user } = useSelector(state => state.auth);
+    const dispatch = useDispatch();
+    const location = useLocation();
+    const { savedCards, loading, error } = useSelector(state => state.card);
+
     useEffect(() => {
-        dispatch(getSavedCards())
-    }, [dispatch])
+        if (!user) {
+            navigate("/login", { state: { from: location.pathname } });
+        }
+        dispatch(getSavedCards());
+    }, [dispatch]);
+
     const handleDelete = async (cardID) => {
-        await dispatch(removeCard({ paymentMethodId: cardID })).unwrap()
-        await dispatch(getSavedCards()).unwrap()
-    }
+        // Optimistic update often preferred for better UX, then revert on error
+        // const originalCards = savedCards; // Save original state
+        // dispatch(cardRemoved(cardID)); // Remove instantly from UI
+        try {
+            await dispatch(removeCard({ paymentMethodId: cardID })).unwrap();
+            // Re-fetch only if necessary, or let RTK Query handle caching/invalidation
+            await dispatch(getSavedCards()).unwrap(); // Keep this for now, but optimize later
+        } catch (error) {
+            console.error("Failed to remove card:", error);
+            // dispatch(cardsLoaded(originalCards)); // Revert UI on error
+        }
+    };
+
     return (
         <div>
             {loading && <Loader />}
-            <div>
-                {/* Breadcrumbs */}
-                <div className="nav w-[1170px] h-[21px] my-[34px] mx-auto flex justify-between">
-                    <div className="bread-crumb">
-                        <Link to="/" className="text-[#605f5f] text-[14px] hover:text-black">Home</Link><span className="m-[11px] text-[14px] text-[#605f5f]">/</span><Link to="/manage-my-account" className="text-[#605f5f] text-[14px] hover:text-black">My Account</Link><span className="m-[11px] text-[14px] text-[#605f5f]">/</span><Link to="/my-profile" className="text-[#605f5f] text-[14px] hover:text-black">My Profile</Link><span className="m-[11px] text-[14px] text-[#605f5f]">/</span><Link to="/payment-options" className="text-[14px]">Payment Options</Link>
+            <div className={`${loading ? "hidden" : ""}`}>
+                {/* Breadcrumbs - Responsive as per AddressBook */}
+                <div className="nav w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto h-auto my-4 md:my-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div className="bread-crumb flex items-center mb-2 sm:mb-0">
+                        <Link to="/" className="text-[#605f5f] text-sm hover:text-black">Home</Link>
+                        <span className="mx-2 text-sm text-[#605f5f]">/</span>
+                        <Link to="/manage-my-account" className="text-[#605f5f] text-sm hover:text-black">My Account</Link>
+                        <span className="mx-2 text-sm text-[#605f5f]">/</span>
+                        <Link to="/payment-options" className="text-sm">Payment Options</Link>
                     </div>
-                    <div className="welcome h-[21px]">
-                        <h6 className="text-[14px]">Welcome! <span className="text-[#DB4444]">{user?.fullName}</span></h6>
+                    <div className="welcome h-auto text-sm">
+                        <h6>Welcome! <span className="text-[#DB4444]">{user?.fullName}</span></h6>
                     </div>
                 </div>
                 {/* Breadcrumbs Ends Here*/}
-                <section className="w-[1170px]  mx-auto mb-[120px] flex justify-between">
-                    <Aside setActive='payment-options' />
-                    <div className="payment-options w-[900px]">
-                        <div className="heading  mb-[9px]">
-                            <span className="text-[25px] font-400">Payment Options</span>
+
+                <section className="w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto mb-10 md:mb-16 flex flex-col lg:flex-row lg:gap-10">
+
+                    <div className="payment-options w-full lg:flex-grow"> {/* `lg:w-[1000px]` is too specific, use `flex-grow` */}
+                        <div className="heading flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6">
+                            <span className="text-xl md:text-2xl font-semibold">Payment Options</span>
+                            {/* You might want an "Add New Card" button here for consistency with Address Book */}
+                            {/* <button className="mt-4 sm:mt-0 bg-[#47B2CA] text-white py-2 px-4 rounded-sm text-sm font-medium hover:bg-[#85BCCA]">ADD NEW CARD</button> */}
                         </div>
-                        <table>
-                            <thead className=" w-[900px] h-[50px] flex items-center shadow">
-                                <tr className="w-[860px] mx-auto flex ">
-                                    <th className="font-normal w-[247px] text-left">Card Number</th>
-                                    <th className="font-normal w-[570px] text-left">Expiry Date</th>
-                                    <th />
-                                </tr>
-                            </thead>
-                            <tbody className="flex flex-col w-[900px]">
-                                {savedCards && savedCards.map((cardItem, index) => (
-                                    <PaymentCardRow key={cardItem._id || index} card={cardItem} onDelete={handleDelete} />
-                                ))}
-                                {!savedCards || savedCards.length === 0 ? (
-                                    <tr className="w-[900px] p-[15px] h-[46px] flex items-center mx-auto shadow justify-center text-[#A6A6A6]">
-                                        <td>No payment options found</td>
-                                    </tr>
-                                ) : ""}
-                            </tbody>
-                        </table>
+
+                        {/* Responsive Table/List View */}
+                        <div className="w-full">
+                            {/* Table Header for Medium and Larger Screens */}
+                            <div className="hidden md:flex bg-gray-50 h-auto py-3 px-4 items-center shadow rounded-t-md">
+                                <div className="w-1/2 font-normal text-sm md:text-base text-left">Card Number</div>
+                                <div className="w-1/3 font-normal text-sm md:text-base text-left">Expiry Date</div>
+                                <div className="w-auto font-normal text-sm md:text-base text-right ml-auto">Action</div>
+                            </div>
+
+                            {/* Card List - Always a flex column on all screen sizes to stack `PaymentCardRow` divs */}
+                            <div className="flex flex-col w-full shadow rounded-b-md md:border-t-0 border border-gray-200">
+                                {savedCards && savedCards.length > 0 ? (
+                                    savedCards.map((cardItem) => (
+                                        <PaymentCardRow key={cardItem.id} card={cardItem} onDelete={handleDelete} />
+                                    ))
+                                ) : (
+                                    <div className="w-full p-4 flex items-center justify-center text-[#A6A6A6] text-center bg-white rounded-b-md">
+                                        No payment options found
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
-
         </div>
-    )
-}
+    );
+};
 
-export default PaymentOption
+export default PaymentOption;
