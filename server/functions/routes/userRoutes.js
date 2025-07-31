@@ -1,9 +1,7 @@
 import express from "express";
-import { registerUser, verifyUser, resendToken, login, logout, refreshUser, updateProfile, getAllCustomers, addCustomer, setPassword, refreshAccessToken, getUser } from "../controllers/userController.js"
+import { registerUser, verifyUser, resendToken, login, logout, refreshUser, updateProfile, getAllCustomers, addCustomer, setPassword, refreshAccessToken, getUser, subscribeToNewsletter } from "../controllers/userController.js"
 import { verifyAccessToken, verifyAdmin } from "../middlewares/authMiddleware.js";
 import { googleCallback, googleLogin } from "../controllers/authGoogleController.js";
-import { mergeCart } from "../controllers/cartController.js";
-import { mergeWishlist } from "../controllers/wishlistController.js";
 
 const router = express.Router()
 
@@ -21,6 +19,7 @@ router.post("/set-password", setPassword)
 router.get("/google", googleLogin)
 router.get("/google/callback", googleCallback)
 router.get("/get-user",verifyAccessToken,getUser)
+router.post("/subscribe-newsletter", subscribeToNewsletter);
 
 
 export default router

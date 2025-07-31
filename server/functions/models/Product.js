@@ -25,19 +25,6 @@ const productSchema = new mongoose.Schema({
     salesVolume: { type: Number, default: 0 },
 }, { timestamps: true });
 
-// Virtual for flash sale details
-productSchema.virtual('flashSale', {
-    ref: 'FlashSale',
-    localField: '_id',
-    foreignField: 'products.product',
-    justOne: true,
-    match: { isActive: true, startTime: { $lte: new Date() }, endTime: { $gte: new Date() } },
-});
-
-// Include virtuals in output
-productSchema.set('toObject', { virtuals: true });
-productSchema.set('toJSON', { virtuals: true });
-
 const Product = mongoose.model('Product', productSchema);
 
 export default Product;
