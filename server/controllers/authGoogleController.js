@@ -58,7 +58,7 @@ export const googleLogin = passport.authenticate("google", {
 
 
 export const googleCallback = [
-  passport.authenticate("google", { failureRedirect: "http://localhost:5173/login", session: false }),
+  passport.authenticate("google", { failureRedirect: "https://exclusive-ecommerce-lac.vercel.app/login", session: false }),
   (req, res) => {
     const user = req.user;
 
@@ -68,10 +68,11 @@ export const googleCallback = [
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: "Strict"
+      sameSite: "Strict",
     });
 
-    const redirectUrl = `http://localhost:5173/auth-callback?token=${accessToken}`;
+    const redirectUrl = `https://exclusive-ecommerce-lac.vercel.app/auth-callback?token=${accessToken}`;
     res.redirect(redirectUrl);
   }
 ];
+
