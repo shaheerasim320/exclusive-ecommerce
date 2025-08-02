@@ -3,7 +3,7 @@ import { Send, Facebook, Twitter, Instagram, Linkedin, MapPin, Mail, Phone } fro
 import { Link } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import { toast, ToastContainer } from 'react-toastify';
-import NewsletterSuccessModal from './modals/NewsLetterSuccessModal';
+import NewsletterSuccessModal from './modals/NewsletterSuccessModal';
 
 const Footer = () => {
     const [loading, setLoading] = useState(false);
