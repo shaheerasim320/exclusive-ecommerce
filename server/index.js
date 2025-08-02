@@ -103,7 +103,9 @@ app.use("/api/v1/admin", verifyAccessToken, verifyAdmin, adminRoutes)
 app.use("/api/v1/flashSale", flashSaleRoutes)
 
 
-
+app.use("/", (req, res) => {
+    res.status(200).json({message:"Welcome To Exclusive Ecommerce"})
+})
 app.use((req, res) => {
     res.status(404).json({ message: "Route not found" });
 });
