@@ -18,16 +18,11 @@ const Cancellation = () => {
         }
     }, [user])
 
-    useEffect(() => {
-        if (cancellation) {
-            console.log(cancellation)
-        }
-    }, [cancellation])
     return (
         <div>
             {loading && <div className="flex h-screen justify-center"><Loader /></div>}
             <div className={`${loading ? "hidden" : ""}`}>
-                {/* Breadcrumbs - Made responsive */}
+                {/* Breadcrumbs */}
                 <div className="nav w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto h-auto my-4 md:my-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div className="bread-crumb flex items-center mb-2 sm:mb-0">
                         <Link to="/" className="text-[#605f5f] text-sm hover:text-black">Home</Link>

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import FlashSale from './FlashSaleSchema.js';
 
 const productSchema = new mongoose.Schema({
     storeName: { type: String, required: true },
@@ -24,6 +25,26 @@ const productSchema = new mongoose.Schema({
     salesCount: { type: Number, default: 0 },
     salesVolume: { type: Number, default: 0 },
 }, { timestamps: true });
+
+productSchema.methods.getWithFlashSale = async function () {
+  const now = new Date();
+
+  const flashSale = await FlashSale.findOne({
+    startTime: { $lte: now },
+    endTime: { $gte: now },
+    isActive: true,
+    'products.product': this._id
+  });
+
+  const saleItem = flashSale?.products.find(p => p.product.toString() === this._id.toString());
+
+  const flashSaleDiscount = saleItem?.discount || null;
+  return {
+    ...this.toObject(),
+    flashSaleDiscount,
+  };
+};
+
 
 const Product = mongoose.model('Product', productSchema);
 

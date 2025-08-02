@@ -1,10 +1,5 @@
-// import WishlistItem from "../models/WishlistItem.js";
-import User from "../models/User.js"
-import Cart from "../models/Cart.js";
-// import CartItem from "../models/CartItem.js";
 import Wishlist from "../models/Wishlist.js";
-
-
+import { enrichItemsWithFlashSale } from "../utils/enrichWithFlashSale.js";
 
 export const addToWishlist = async (req, res) => {
     const { product } = req.body;
@@ -54,7 +49,6 @@ export const removeFromWishlist = async (req, res) => {
 export const mergeWishlist = async (req, res) => {
     const guestId = req.guestId;
     const userId = req.user?.userId
-    const { mergeOptions } = req.body;
 
     try {
         const guestWishlist = await Wishlist.findOne({ guestId });
@@ -75,14 +69,10 @@ export const mergeWishlist = async (req, res) => {
             }
         });
 
-        // Save the updated wishlist
         await userWishlist.save();
 
-        // Clear guest wishlist after merging
         await Wishlist.findOneAndDelete({ guestId });
 
-
-        // Return the updated wishlist data
         const updatedWishlist = await userWishlist.populate("items.product");
         console.log(updatedWishlist);
         res.status(200).json({ message: "Wishlist merged successfully", wishlist: updatedWishlist.items });
@@ -106,7 +96,6 @@ export const discardGuestWishlist = async (req, res) => {
             return res.status(404).json({ message: "Guest wishlist not found" });
         }
 
-        // Delete the wishlist
         await Wishlist.deleteOne({ guestId });
 
         return res.status(200).json({ message: "Guest wishlist discarded successfully" });
@@ -206,7 +195,14 @@ export const getWishlistItems = async (req, res) => {
     try {
         const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
         const wishlist = await Wishlist.findOne(query).populate("items.product");
-        res.status(200).json({ items: wishlist?.items || [] });
+        if (!wishlist || !wishlist.items) {
+            return res.status(200).json({ items: [] });
+        }
+
+        const enrichedItems = await enrichItemsWithFlashSale(wishlist.items);
+
+        res.status(200).json({ items: enrichedItems });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error" });
@@ -217,7 +213,8 @@ export const getGuestWishlistItems = async (req, res) => {
     const guestId = req.guestId;
     try {
         const wishlist = await Wishlist.findOne({ guestId }).populate("items.product");
-        res.status(200).json({ items: wishlist?.items || [] });
+        const enrichedItems = await enrichItemsWithFlashSale(wishlist.items || []);
+        res.status(200).json({ items: enrichedItems });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error" });

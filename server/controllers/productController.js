@@ -34,10 +34,7 @@ const generateProductCode = async () => {
 
 const getBestSellingProducts = async (req, res) => {
     try {
-        const products = await Product.find()
-            .sort({ salesVolume: -1, salesCount: -1 })
-            .limit(10)
-            .lean();
+        const products = await Product.find().sort({ salesVolume: -1, salesCount: -1 }).limit(10)
 
         const enriched = await enrichProductsWithFlashSale(products);
         res.json(enriched);
@@ -52,15 +49,13 @@ const getProductByProductCode = async (req, res) => {
     const { productCode } = req.params;
 
     try {
-        const product = await Product.findOne({ productCode })
-            .populate("category flashSaleId")
-            .lean();
+        const product = await Product.findOne({ productCode }).populate("category flashSaleId")
 
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        const enrichedProduct = await enrichProductsWithFlashSale(product);
+        const enrichedProduct = await product.getWithFlashSale();
 
         res.json(enrichedProduct);
     } catch (error) {
@@ -71,8 +66,8 @@ const getProductByProductCode = async (req, res) => {
 
 const getProducts = async (req, res) => {
     try {
-        const products = await Product.find({ onFlashSale: false }).lean();
-        const enriched = await enrichProductsWithFlashSale(products);
+        const products = await Product.find({ onFlashSale: false })
+        const enriched = await Promise.all(products.map(p => p.getWithFlashSale()));
         res.json(enriched);
     } catch (error) {
         console.log(error.message);
@@ -110,8 +105,8 @@ const deleteProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find().lean();
-        const enriched = await enrichProductsWithFlashSale(products);
+        const products = await Product.find();
+        const enriched = await Promise.all(products.map(p => p.getWithFlashSale()));
         res.json(enriched);
     } catch (error) {
         console.log(error.message);
@@ -120,21 +115,15 @@ const getAllProducts = async (req, res) => {
 };
 
 
-// Product search endpoint
 const searchProducts = async (req, res) => {
     try {
         const { q } = req.query;
         if (!q) return res.status(400).json({ message: 'No search query provided' });
 
-        const products = await Product.find({
-            $or: [
-                { title: { $regex: q, $options: 'i' } },
-                { description: { $regex: q, $options: 'i' } }
-            ]
-        }).populate('category').lean();
+        const products = await Product.find({ $or: [{ title: { $regex: q, $options: 'i' } }, { description: { $regex: q, $options: 'i' } }] }).populate('category')
 
-        const enriched = await enrichProductsWithFlashSale(products);
-        res.json({ products: enriched });
+        const enrichedProducts = await Promise.all(products.map(product => product.getWithFlashSale()));
+        res.json({ products: enrichedProducts });
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });
     }

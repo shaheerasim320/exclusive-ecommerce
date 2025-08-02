@@ -16,11 +16,11 @@ const placeOrder = async (req, res) => {
             products: req.body.products,
             orderDate: req.body.orderDate || Date.now(),
             orderStatus: req.body.orderStatus || "pending",
-            couponCode:req.body.couponCode,
-            couponDiscountAmount:req.body.couponDiscountAmount,
-            subtotal:req.body.subtotal,
+            couponCode: req.body.couponCode,
+            couponDiscountAmount: req.body.couponDiscountAmount,
+            subtotal: req.body.subtotal,
             shippingFee: req.body.shippingFee || 0,
-            totalAmount:req.body.totalAmount,
+            totalAmount: req.body.totalAmount,
             paymentMethod: req.body.paymentMethod,
             paymentStatus: req.body.transactionId == "COD_PAYMENT" ? "pending" : "paid",
             transactionId: req.body.transactionId,
@@ -30,6 +30,39 @@ const placeOrder = async (req, res) => {
         await newOrder.save()
         user.orders.push(newOrder._id)
         await user.save()
+        const placeOrder = async (req, res) => {
+            const userID = req.user.userId
+            try {
+                const user = await User.findById(userID)
+                if (!user) {
+                    return res.status(404).json({ message: "Unable to find user" })
+                }
+                const newOrder = new Order({
+                    user: userID,
+                    orderId: req.body.orderId,
+                    products: req.body.products,
+                    orderDate: req.body.orderDate || Date.now(),
+                    orderStatus: req.body.orderStatus || "pending",
+                    couponCode: req.body.couponCode,
+                    couponDiscountAmount: req.body.couponDiscountAmount,
+                    subtotal: req.body.subtotal,
+                    shippingFee: req.body.shippingFee || 0,
+                    totalAmount: req.body.totalAmount,
+                    paymentMethod: req.body.paymentMethod,
+                    paymentStatus: req.body.transactionId == "COD_PAYMENT" ? "pending" : "paid",
+                    transactionId: req.body.transactionId,
+                    paymentDate: req.body.transactionId != "COD_PAYMENT" ? Date.now() : null,
+                    shippingAddress: req.body.shippingAddress
+                })
+                await newOrder.save()
+                user.orders.push(newOrder._id)
+                await user.save()
+                return res.status(201).json({ message: "Order placed successfully" })
+            } catch (error) {
+                console.log(error)
+                return res.status(500).json({ message: "Error in placing order" })
+            }
+        }
         return res.status(201).json({ message: "Order placed successfully" })
     } catch (error) {
         console.log(error)
@@ -145,17 +178,17 @@ const cancelOrder = async (req, res) => {
 const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find().populate("user")
-        const preparedOrders =[]
-        orders.map((order)=>{
-            const singleOrder ={
-                "_id":order._id,
-                "fullName":order.user.fullName,
-                "email":order.user.email,
-                "orderId":order.orderId,
-                "totalAmount":order.totalAmount,
-                "orderStatus":order.orderStatus,
-                "paymentStatus":order.paymentStatus,
-                "orderDate":order.createdAt
+        const preparedOrders = []
+        orders.map((order) => {
+            const singleOrder = {
+                "_id": order._id,
+                "fullName": order.user.fullName,
+                "email": order.user.email,
+                "orderId": order.orderId,
+                "totalAmount": order.totalAmount,
+                "orderStatus": order.orderStatus,
+                "paymentStatus": order.paymentStatus,
+                "orderDate": order.createdAt
             }
             preparedOrders.push(singleOrder)
         })

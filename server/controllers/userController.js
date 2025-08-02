@@ -645,7 +645,7 @@ export const subscribeToNewsletter = async (req, res) => {
             process.env.API_URL,
             {
                 sender: { email: "shaheerasim320@gmail.com", name: "Shaheer Asim" },
-                to: [{ email: recipientEmail }],
+                to: [{ email: email }],
                 subject: subject,
                 htmlContent: htmlContent
             },
@@ -656,9 +656,9 @@ export const subscribeToNewsletter = async (req, res) => {
                 }
             }
         );
-        res.status(200).json({ message: `Newsletter confirmation email sent to ${recipientEmail}` });
+        res.status(200).json({ message: `Newsletter confirmation email sent to ${email}` });
     } catch (error) {
-        res.status(500).json({ message: `Failed to send newsletter confirmation email to ${recipientEmail}` });
+        res.status(500).json({ message: `Failed to send newsletter confirmation email to ${email}` });
         console.error(error.message);
     }
 }

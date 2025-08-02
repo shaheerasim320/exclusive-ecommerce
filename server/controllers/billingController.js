@@ -37,7 +37,7 @@ const fetchBillingDetailsByID = async (req, res) => {
             return res.status(400).json({ message: "Billing ID is required." });
         }
 
-        const billing = await Billing.findOne({ publicId: billingPublicID }).populate("items.product").populate("coupon");
+        let billing = await Billing.findOne({ publicId: billingPublicID }).populate("items.product").populate("coupon");
 
         if (!billing) {
             return res.status(404).json({ message: "Requested billing resource not found." });
@@ -46,8 +46,20 @@ const fetchBillingDetailsByID = async (req, res) => {
         if (billing.user != userID) {
             return res.status(403).json({ message: "You do not have permission to access this billing resource." })
         }
-        res.status(200).json(billing);
-
+        const enrichedItems = await Promise.all(
+            billing.items.map(async (item) => {
+                const enrichedProduct = await item.product.getWithFlashSale();
+                return {
+                    ...item.toObject(),
+                    product: enrichedProduct,
+                };
+            })
+        );
+        const enrichedBilling = {
+            ...billing.toObject(),   
+            items: enrichedItems     
+        };
+        res.status(200).json(enrichedBilling);
     } catch (error) {
         console.error("Error fetching billing details:", error);
         return res.status(500).json({ message: "Internal server error." });

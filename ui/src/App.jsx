@@ -81,6 +81,7 @@ import {
 
 import { fetchActiveFlashSale } from './slices/flashSaleSlice';
 import SearchResults from './pages/SearchResults';
+import AllFlashSaleProduct from './pages/AllFlashSaleProduct';
 
 function App() {
   const [initializing, setInitializing] = useState(true);
@@ -172,6 +173,7 @@ function App() {
           <Route path="/category/:categorySlug" element={<CategoryPage />} />
           <Route path="/all-products" element={<AllProducts />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/all-flash-sale-products" element={<AllFlashSaleProduct />} />
           <Route path="*" element={<P404 />} />
         </Routes>
       </main>

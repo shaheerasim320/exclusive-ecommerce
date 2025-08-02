@@ -65,9 +65,7 @@ const Billing = () => {
     const [showError, setShowError] = useState(false);
     const [billingItem, setBillingItem] = useState(null);
     const [coupon, setCoupon] = useState(null);
-    console.log(defaultCard)
     const validateFields = () => {
-        console.log("Validating:", { name, phoneNumber, address, selectedCountry, selectedState, selectedCity, cardName, cardComplete });
         const errors = {};
 
         if (!shippingAddress) {
@@ -157,7 +155,6 @@ const Billing = () => {
                     }
                 })
                 .catch((error) => {
-                    console.error(error);
                     setShippingAddress(defaultShippingAddress);
                 });
         } else if (defaultShippingAddress) {
@@ -187,7 +184,6 @@ const Billing = () => {
         setIsModalOpen(false);
         navigate("/");
     };
-    console.log(cardChecked);
     const handleAddressChange = (e) => {
         setAddress(e.target.value);
         setFieldErrors(prev => ({ ...prev, address: '' }));
@@ -292,7 +288,6 @@ const Billing = () => {
     };
 
     const handleCardElementChange = (e) => {
-        console.log("Card complete:", e.complete, "Error:", e.error?.message);
         setCardError(e.error ? e.error.message : "");
         setCardComplete(e.complete);
         setFieldErrors(prev => ({ ...prev, cardFields: e.error ? e.error.message : e.complete ? '' : 'Complete card details are required' }));
@@ -300,7 +295,6 @@ const Billing = () => {
 
     const handleSaveCard = async () => {
         if (!stripe || !elements) return;
-        console.log("Saving Card")
         try {
             const response = await api.post("/card/create-setup-intent", { name: cardName });
             if (!response.data.clientSecret) {

@@ -116,7 +116,7 @@ const ManageMyAccount = () => {
 
                         {/* Recent Orders Section */}
                         <div className="orders w-full h-auto">
-                            <div className="heading my-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                            <div className="heading my-4 flex md:flex-col md:items-start sm:flex-row sm:items-center sm:justify-between">
                                 <h5 className="text-xl md:text-2xl font-semibold">Recent Orders</h5>
                                 {/* Header for desktop */}
                                 <div className="hidden sm:grid grid-cols-4 gap-2 w-full mt-4 sm:mt-0 bg-gray-50 p-2 rounded font-medium text-gray-700 text-sm md:text-base">

@@ -1,16 +1,40 @@
 import React, { useState } from 'react';
 import { Send, Facebook, Twitter, Instagram, Linkedin, MapPin, Mail, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../api/axiosInstance';
+import { toast, ToastContainer } from 'react-toastify';
+import NewsletterSuccessModal from './modals/NewsLetterSuccessModal';
 
 const Footer = () => {
+    const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
-
-    const handleEmailSubmit = (e) => {
-        e.preventDefault();
-        console.log('Email submitted:', email);
-        setEmail('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const isValidEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
     };
 
+    const handleEmailSubmit = async (e) => {
+        e.preventDefault();
+        const trimmedEmail = email.trim();
+
+        if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
+            toast.error("Please enter a valid email address.");
+            return;
+        }
+        setLoading(true);
+        try {
+            const res = await api.post("/users/subscribe-newsletter", {
+                email: trimmedEmail
+            });
+            console.log(res)
+            setIsModalOpen(true);
+            setEmail('');
+        } catch (error) {
+            toast.error("Subscription failed")
+        } finally {
+            setLoading(false); // End loading
+        }
+    };
     return (
         <div className='font-inter'>
             <footer className="bg-black text-white py-8 md:py-12">
@@ -26,21 +50,29 @@ const Footer = () => {
                                 <p className="mb-4 text-gray-300">Get 10% off your order</p>
 
                                 <div className="">
-                                    <div className="flex items-center border-2 border-white rounded-sm bg-black">
+                                    <div className="flex items-center border-2 border-white rounded-sm bg-black w-full overflow-hidden">
                                         <input
                                             type="email"
                                             value={email}
+                                            id='subscribEmail'
                                             onChange={(e) => setEmail(e.target.value)}
                                             placeholder="Enter Your Email"
-                                            className="bg-transparent border-0 outline-none flex-1 py-2 px-3 max-w-[87%] text-white placeholder-gray-400"
+                                            className="bg-transparent border-0 outline-none flex-1 py-2 px-3 text-white placeholder-gray-400 w-[70%]"
                                         />
                                         <button
+                                            disabled={!isValidEmail(email) || loading}
                                             onClick={handleEmailSubmit}
-                                            className=" hover:bg-gray-800 transition-colors rounded-r-sm"
+                                            className={`h-full px-3 py-2 flex items-center justify-center rounded-r-sm transition-colors ${(!isValidEmail(email) || loading) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'
+                                                }`}
                                         >
-                                            <Send size={20} className="text-white" />
+                                            {loading ? (
+                                                <span className="text-white text-xs whitespace-nowrap">Sending...</span>
+                                            ) : (
+                                                <Send size={20} className="text-white" />
+                                            )}
                                         </button>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -217,6 +249,16 @@ const Footer = () => {
                     </div>
                 </div>
             </footer>
+            {isModalOpen && (
+                <NewsletterSuccessModal onClose={() => setIsModalOpen(false)} />
+            )}
+            <ToastContainer
+                position="bottom-right" // Position of the toast message
+                autoClose={3000} // Duration in milliseconds before toast disappears
+                hideProgressBar={false} // Hide progress bar for simplicity
+                closeOnClick={true} // Allow closing the toast by clicking
+                pauseOnHover
+            />
         </div>
     );
 };

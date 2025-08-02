@@ -2,6 +2,7 @@ import React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Aside from '../components/Aside'
 import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
 
 const Profile = () => {
   const { user } = useSelector(state => state.auth)

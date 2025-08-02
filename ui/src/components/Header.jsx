@@ -7,8 +7,6 @@ import { fetchWishlist } from "../slices/wishlistSlice";
 import { fetchCart } from "../slices/cartSlice";
 
 const Header = () => {
-
-
   const [isAccountDropdownVisible, setAccountDropdownVisible] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("home");
@@ -147,20 +145,43 @@ const Header = () => {
             {/* Icons Container */}
             <div className="flex items-center gap-2 md:gap-4">
               {/* Search - Hidden on mobile, shown on tablet+ */}
-              <div className="hidden md:flex search px-3 py-2 bg-gray-100 rounded w-48 lg:w-64 items-center">
-                <input
-                  type="text"
-                  placeholder="What are you looking for?"
-                  className="bg-transparent border-0 focus:outline-none flex-1 text-sm"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Search size={20} className="text-gray-600 cursor-pointer" />
+              <div className="hidden md:flex search px-3 py-2 bg-gray-100 rounded w-48 lg:w-64 items-center justify-between">
+                <form onSubmit={(e) => { e.preventDefault(); const q = searchQuery.trim(); if (q) navigate(`/search?q=${encodeURIComponent(q)}`); }} className="flex items-center w-full">
+                  <input
+                    type="text"
+                    placeholder="What are you looking for?"
+                    className="bg-transparent border-0 focus:outline-none flex-1 text-sm"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const q = searchQuery.trim();
+                        if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+                      }
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    className="cursor-pointer"
+                    aria-label="Search"
+                  >
+                    <Search size={20} className="text-gray-600" />
+                  </button>
+                </form>
               </div>
 
               {/* Mobile Search Icon */}
               <div className="md:hidden">
-                <Search size={20} className="cursor-pointer" />
+                <button
+                  onClick={() => {
+                    const q = searchQuery.trim();
+                    if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Search size={20} />
+                </button>
               </div>
 
               {/* Wishlist */}
@@ -261,7 +282,14 @@ const Header = () => {
 
           {/* Mobile Search Bar */}
           <div className="md:hidden mt-4">
-            <div className="search px-3 py-2 bg-gray-100 rounded flex items-center">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = searchQuery.trim();
+                if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+              }}
+              className="search px-3 py-2 bg-gray-100 rounded flex items-center"
+            >
               <input
                 type="text"
                 placeholder="What are you looking for?"
@@ -269,8 +297,13 @@ const Header = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Search size={20} className="text-gray-600 cursor-pointer" />
-            </div>
+              <button
+                type="submit"
+                aria-label="Search"
+              >
+                <Search size={20} className="text-gray-600 cursor-pointer" />
+              </button>
+            </form>
           </div>
 
           {/* Mobile Navigation Menu */}

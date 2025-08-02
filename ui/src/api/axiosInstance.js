@@ -12,6 +12,7 @@ const api = axios.create({
     withCredentials: true,
 });
 
+// Add token to request headers
 api.interceptors.request.use(
     (config) => {
         const state = store.getState();
@@ -24,21 +25,24 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-
+// Handle token refresh
 api.interceptors.response.use(
-    (res) => res,
+    (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
         if (
             error.response?.status === 403 &&
             !originalRequest._retry &&
-            error.config.url !== "/users/refresh-access-token"
+            originalRequest.url !== "/users/refresh-access-token"
         ) {
             originalRequest._retry = true;
+
             try {
                 const { accessToken } = await store.dispatch(refreshAccessToken()).unwrap();
-                store.dispatch();
+
+                // Update token in Redux store (already done in the slice if refreshAccessToken is correct)
+                // Retry original request with new token
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
@@ -46,9 +50,9 @@ api.interceptors.response.use(
                 return Promise.reject(refreshError);
             }
         }
+
         return Promise.reject(error);
     }
 );
-
 
 export default api;

@@ -1,29 +1,21 @@
 import Cart from "../models/Cart.js";
 import Coupon from "../models/Coupon.js";
-import { enrichCartItems } from "../utils/enrichCartItems.js";
-import { enrichProductsWithFlashSale } from "../utils/enrichWithFlashSale.js";
+import { enrichItemsWithFlashSale } from "../utils/enrichWithFlashSale.js";
 
 export const getCartItems = async (req, res) => {
     try {
         const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
 
-        const cart = await Cart.findOne(query).populate({ path: "items.product", options: { lean: true } }).lean();
+        const cart = await Cart.findOne(query).populate("items.product");
 
         if (!cart || !cart.items) {
             return res.status(200).json([]);
         }
 
-        const products = cart.items.map(item => item.product);
-        const enrichedProducts = await enrichProductsWithFlashSale(products);
+        const enrichedItems = await enrichItemsWithFlashSale(cart.items);
 
-        const enrichedCartItems = cart.items.map(item => {
-            const enrichedProduct = enrichedProducts.find(p => p._id.toString() === item.product._id.toString());
-            return {
-                ...item,
-                product: enrichedProduct || item.product
-            };
-        });
-        res.status(200).json(enrichedCartItems);
+
+        res.status(200).json(enrichedItems);
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ message: "Server error, please try again" });
@@ -34,21 +26,13 @@ export const getCartItems = async (req, res) => {
 export const getGuestCartItems = async (req, res) => {
     const guestId = req.guestId;
     try {
-        const cart = await Cart.findOne({ guestId }).populate({ path: "items.product", options: { lean: true } }).lean();
+        const cart = await Cart.findOne({ guestId }).populate("items.product");
         if (!cart || !cart.items) {
             return res.status(200).json([]);
         }
-        const products = cart.items.map(item => item.product);
-        const enrichedProducts = await enrichProductsWithFlashSale(products);
+        const enrichedItems = await enrichItemsWithFlashSale(cart.items);
 
-        const enrichedCartItems = cart.items.map(item => {
-            const enrichedProduct = enrichedProducts.find(p => p._id.toString() === item.product._id.toString());
-            return {
-                ...item,
-                product: enrichedProduct || item.product
-            };
-        });
-        res.status(200).json(enrichedCartItems);
+        res.status(200).json(enrichedItems);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Server error, please try again" });
@@ -78,7 +62,9 @@ export const addToCart = async (req, res) => {
         await cart.populate("items.product");
         await cart.save();
 
-        res.status(200).json({ items: cart.items });
+        const enrichedItems = await enrichItemsWithFlashSale(cart.items);
+
+        res.status(200).json({ items: enrichedItems });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ message: "Server error, please try again" });
@@ -94,7 +80,15 @@ export const removeFromCart = async (req, res) => {
             { $pull: { items: { _id: cartItemId } } }
         )
         const cart = await Cart.findOne(query).populate("items.product");
-        res.status(200).json({ items: cart?.items || [] });
+
+        if (!cart || !cart.items) {
+            return res.status(200).json({ items: [] });
+        }
+
+        const enrichedItems = await enrichItemsWithFlashSale(cart.items);
+
+
+        res.status(200).json({ items: enrichedItems });
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ message: "Server error, please try again" });
@@ -107,13 +101,8 @@ export const mergeCart = async (req, res) => {
     const { mergeOptions } = req.body;
 
     try {
-        console.log(guestId);
-        console.log(userId);
-        console.log(mergeOptions);
         const guestCart = await Cart.findOne({ guestId });
         const userCart = await Cart.findOne({ user: userId });
-        console.log(userCart);
-        console.log(guestCart);
         if (!guestCart && !userCart) {
             return res.status(404).json({ message: "No cart found for guest or user" });
         }
@@ -137,9 +126,11 @@ export const mergeCart = async (req, res) => {
 
             await Cart.findOneAndDelete({ guestId });
 
-            const updatedCart = await userCart.populate("items.product");
-            console.log(updatedCart);
-            res.status(200).json({ message: "Cart merged successfully", cart: updatedCart.items });
+            await userCart.populate("items.product");
+
+            const enrichedItems = await enrichItemsWithFlashSale(userCart.items);
+
+            res.status(200).json({ message: "Cart merged successfully", cart: enrichedItems });
         }
     } catch (error) {
         console.error(error);
@@ -170,7 +161,10 @@ export const updateProductQuantity = async (req, res) => {
         await cart.populate("items.product");
         await cart.save();
 
-        res.status(200).json({ message: "Cart updated successfully", items: cart?.items || [] });
+        const enrichedItems = await enrichItemsWithFlashSale(cart.items);
+
+
+        res.status(200).json({ message: "Cart updated successfully", items: enrichedItems });
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ message: "Server error, please try again" });
@@ -271,7 +265,6 @@ export const discardGuestCart = async (req, res) => {
             return res.status(404).json({ message: "Guest cart not found" });
         }
 
-        // Delete the cart
         await Cart.deleteOne({ guestId });
 
         return res.status(200).json({ message: "Guest cart discarded successfully" });

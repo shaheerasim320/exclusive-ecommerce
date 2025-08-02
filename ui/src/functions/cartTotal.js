@@ -1,14 +1,42 @@
 import { calculateDiscountPrice } from "./DiscountPriceCalculator";
 
 export const calculateSubtotal = (items, order = false) => {
-    let subtotal = 0
-    !order ? subtotal = items.reduce((accumulator, currentItem) => {
-        return currentItem.product.discount != 0 ? currentItem.product.stock != 0 ? Math.round(accumulator + calculateDiscountPrice(currentItem.product.price, currentItem.product.discount) * currentItem.quantity) : 0 : currentItem.product.stock != 0 ? accumulator + currentItem.product.price * currentItem.quantity : 0;
-    }, 0) : subtotal = items.products.reduce((accumulator, currentItem) => {
-        return currentItem.discount != 0 ? Math.round(accumulator + calculateDiscountPrice(currentItem.price, currentItem.discount) * currentItem.quantity) : accumulator + currentItem.price * currentItem.quantity;
-    }, 0);
-    return subtotal
-}
+    let subtotal = 0;
+
+    if (!order) {
+        subtotal = items.reduce((acc, item) => {
+            const { product, quantity } = item;
+
+            if (product.stock === 0) return acc;
+
+            const discount =
+                product.flashSaleDiscount != null
+                    ? product.flashSaleDiscount
+                    : product.discount || 0;
+
+            const price = discount
+                ? calculateDiscountPrice(product.price, discount)
+                : product.price;
+
+            return acc + Math.round(price * quantity);
+        }, 0);
+    } else {
+        subtotal = items.products.reduce((acc, item) => {
+            const { price, discount, flashSaleDiscount, quantity } = item;
+
+            const appliedDiscount =
+                flashSaleDiscount != null ? flashSaleDiscount : discount || 0;
+
+            const finalPrice = appliedDiscount
+                ? calculateDiscountPrice(price, appliedDiscount)
+                : price;
+
+            return acc + Math.round(finalPrice * quantity);
+        }, 0);
+    }
+
+    return subtotal;
+};
 export const calculateCouponAmount = (coupon, price = 0) => {
 
 

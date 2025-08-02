@@ -1,25 +1,28 @@
-import FlashSale from '../models/FlashSaleSchema.js';
+export const enrichItemsWithFlashSale = async (items) => {
+  if (!Array.isArray(items)) return [];
+
+  return Promise.all(
+    items.map(async (item) => {
+      if (!item.product?.getWithFlashSale) {
+        return item;
+      }
+
+      const enrichedProduct = await item.product.getWithFlashSale();
+      return {
+        ...item.toObject?.() || item,
+        product: enrichedProduct,
+      };
+    })
+  );
+};
 
 export const enrichProductsWithFlashSale = async (products) => {
-  const now = new Date();
-  const flashSale = await FlashSale.findOne({
-    startTime: { $lte: now },
-    endTime: { $gte: now },
-    isActive: true,
-  });
+  if (!Array.isArray(products)) return [];
 
-  const enrich = (product) => {
-    const saleItem = flashSale?.products.find(p => p.product.toString() === product._id.toString());
-
-    return {
-      ...product,
-      flashSaleDiscount: saleItem?.discount || null,
-    };
-  };
-
-  if (Array.isArray(products)) {
-    return products.map(enrich);
-  } else {
-    return enrich(products);
-  }
+  return Promise.all(
+    products.map(async (product) => {
+      if (typeof product.getWithFlashSale !== "function") return product;
+      return await product.getWithFlashSale();
+    })
+  );
 };

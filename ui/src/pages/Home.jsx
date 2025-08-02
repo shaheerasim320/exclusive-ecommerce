@@ -48,7 +48,6 @@ const Home = () => {
     const { flashSale, error: flashSaleError } = useSelector((state) => state.flashSale);
     const [flashSaleProducts, setFlashSaleProducts] = useState([]);
 
-    // console.log(flashSaleProducts);
     useEffect(() => {
         if (user && delayedAction && !hasRun.current) {
             if (delayedAction.type == "wishlist") {
@@ -101,8 +100,9 @@ const Home = () => {
         window.location.reload();
     }
     const handleWishlistToggle = async (product) => {
-        if (items.some(item => item.product?._id == product)) {
-            await dispatch(removeFromWishlist({ product })).then(() => { toast.success("Product removed from wishlist") }).catch(() => toast.error("Something went wrong. Please try again"));
+        const wishlistItem = items.find(it=>it.product?._id==product)
+        if (wishlistItem) {
+            await dispatch(removeFromWishlist({ wishlistItemId:wishlistItem._id })).then(() => { toast.success("Product removed from wishlist") }).catch(() => toast.error("Something went wrong. Please try again"));
         } else {
             await dispatch(addToWishlist({ product })).then(() => { toast.success("Product added to wishlist") }).catch(() => toast.error("Something went wrong. Please try again"));;
         }
@@ -280,7 +280,7 @@ const Home = () => {
                         {/* Button */}
                         <div className="button flex justify-center my-10 md:my-16 lg:my-[75px]">
                             <button className="btn-1 bg-[#DB4444] text-white py-3 px-8 rounded-sm text-base font-semibold hover:bg-[#E07575] transition-colors duration-200">
-                                <Link to="#">View All Products</Link>
+                                <Link to="/all-flash-sale-products">View All Products</Link>
                             </button>
                         </div>
                         {/* Button Ends Here */}
