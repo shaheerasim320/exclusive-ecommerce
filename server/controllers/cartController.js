@@ -1,23 +1,54 @@
-// import CartItem from "../models/CartItem.js";
 import Cart from "../models/Cart.js";
 import Coupon from "../models/Coupon.js";
+import { enrichCartItems } from "../utils/enrichCartItems.js";
+import { enrichProductsWithFlashSale } from "../utils/enrichWithFlashSale.js";
 
 export const getCartItems = async (req, res) => {
     try {
         const query = req.user?.userId ? { user: req.user.userId } : { guestId: req.guestId };
-        const cart = await Cart.findOne(query).populate("items.product");
-        res.status(200).json(cart?.items || []);
+
+        const cart = await Cart.findOne(query).populate({ path: "items.product", options: { lean: true } }).lean();
+
+        if (!cart || !cart.items) {
+            return res.status(200).json([]);
+        }
+
+        const products = cart.items.map(item => item.product);
+        const enrichedProducts = await enrichProductsWithFlashSale(products);
+
+        const enrichedCartItems = cart.items.map(item => {
+            const enrichedProduct = enrichedProducts.find(p => p._id.toString() === item.product._id.toString());
+            return {
+                ...item,
+                product: enrichedProduct || item.product
+            };
+        });
+        res.status(200).json(enrichedCartItems);
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ message: "Server error, please try again" });
     }
 };
 
+
 export const getGuestCartItems = async (req, res) => {
     const guestId = req.guestId;
     try {
-        const cart = await Cart.findOne({ guestId }).populate("items.product");
-        res.status(200).json({ items: cart?.items || [] });
+        const cart = await Cart.findOne({ guestId }).populate({ path: "items.product", options: { lean: true } }).lean();
+        if (!cart || !cart.items) {
+            return res.status(200).json([]);
+        }
+        const products = cart.items.map(item => item.product);
+        const enrichedProducts = await enrichProductsWithFlashSale(products);
+
+        const enrichedCartItems = cart.items.map(item => {
+            const enrichedProduct = enrichedProducts.find(p => p._id.toString() === item.product._id.toString());
+            return {
+                ...item,
+                product: enrichedProduct || item.product
+            };
+        });
+        res.status(200).json(enrichedCartItems);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Server error, please try again" });

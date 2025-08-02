@@ -8,7 +8,7 @@ export const injectStore = (_store) => {
 };
 
 const api = axios.create({
-    baseURL: "http://127.0.0.1:5001/exclusive-ecommerce-backend/us-central1/api/v1",
+    baseURL: "http://localhost:8080/api/v1",
     withCredentials: true,
 });
 

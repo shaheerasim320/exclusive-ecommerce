@@ -6,6 +6,7 @@ import Loader from './Loader';
 
 
 const CartProductRow = ({ product, cartItemID, qty, updateQuantity, color, size, onRemove }) => {
+    console.log(product)
     const [quantity, setQuantity] = useState("0" + qty)
     const [increaseSignHovered, setIncreaseSignHovered] = useState(false)
     const [decreaseSignHovered, setDecreaseSignHovered] = useState(false)
@@ -64,7 +65,7 @@ const CartProductRow = ({ product, cartItemID, qty, updateQuantity, color, size,
                     </div>
                 </div>
                 <div className="price text-center">
-                    {product?.discount > 0 ? (<div className="flex gap-[10px] justify-center"><span className="text-[16px] text-[#DB4444]">${Math.round(calculateDiscountPrice(product?.price, product?.discount))}</span><span className="text-[16px] text-[#888888]"><del>${product?.price}</del></span></div>) : (<div><span className="text-[16px] text-[#DB4444]">${product && product?.price}</span></div>)}
+                    {product?.discount > 0 || product?.flashSaleDiscount > 0 ? (<div className="flex gap-[10px] justify-center"><span className="text-[16px] text-[#DB4444]">${product?.flashSaleDiscount > 0 ? Math.round(calculateDiscountPrice(product.price, product.flashSaleDiscount)) : Math.round(calculateDiscountPrice(product.price, product.discount))}</span><span className="text-[16px] text-[#888888]"><del>${product?.price}</del></span></div>) : (<div><span className="text-[16px] text-[#DB4444]">${product && product?.price}</span></div>)}
                 </div>
                 <div className="text-center">
                     <select
@@ -78,7 +79,10 @@ const CartProductRow = ({ product, cartItemID, qty, updateQuantity, color, size,
                     </select>
                 </div>
                 <div className="subtotal text-center">
-                    <span className="text-[16px] select-none">${product && product?.discount ? Math.round(calculateDiscountPrice(product?.price, product?.discount) * qty) : product?.price * qty}</span>
+                    <span className="text-[16px] select-none">
+                        {product && (product.discount > 0 || product.flashSaleDiscount > 0) ? Math.round((product.flashSaleDiscount > 0 ? calculateDiscountPrice(product.price, product.flashSaleDiscount) : calculateDiscountPrice(product.price, product.discount)) * qty) : product.price * qty}
+                    </span>
+
                 </div>
             </td>
             <td colSpan={3} className={`${loading ? "hidden" : "flex"} items-center justify-between `}>

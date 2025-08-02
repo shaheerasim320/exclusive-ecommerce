@@ -1,19 +1,15 @@
-// controllers/flashSaleController.js
 import FlashSale from '../models/FlashSaleSchema.js';
 import Product from '../models/Product.js';
 import mongoose from 'mongoose';
 
-// ✅ Create Flash Sale
 export const createFlashSale = async (req, res) => {
     try {
         const { title, startTime, endTime, products, isActive } = req.body;
 
-        // Basic validation
         if (!title || !startTime || !endTime || !Array.isArray(products) || products.length === 0) {
             return res.status(400).json({ message: 'All fields are required and must include at least one product.' });
         }
 
-        // Validate product IDs and discounts
         const validProducts = await Promise.all(products.map(async p => {
             const exists = await Product.findById(p.product);
             if (!exists) throw new Error(`Product not found: ${p.product}`);
@@ -33,7 +29,6 @@ export const createFlashSale = async (req, res) => {
 
         await flashSale.save();
 
-        // Optional: Set flashSaleId on related products
         await Product.updateMany(
             { _id: { $in: validProducts.map(p => p.product) } },
             { $set: { flashSaleId: flashSale._id } }
@@ -45,7 +40,6 @@ export const createFlashSale = async (req, res) => {
     }
 };
 
-// ✅ Update Flash Sale
 export const updateFlashSale = async (req, res) => {
     try {
         const { id } = req.params;
@@ -69,7 +63,6 @@ export const updateFlashSale = async (req, res) => {
                 };
             }));
 
-            // 1. Clear old flashSaleId from previous products and reset onFlashSale to false
             await Product.updateMany(
                 { flashSaleId: flashSale._id },
                 {
@@ -78,7 +71,6 @@ export const updateFlashSale = async (req, res) => {
                 }
             );
 
-            // 2. Add flashSaleId to new products and set onFlashSale to true
             await Product.updateMany(
                 { _id: { $in: validProducts.map(p => p.product) } },
                 {
@@ -99,7 +91,6 @@ export const updateFlashSale = async (req, res) => {
     }
 };
 
-// ✅ Delete Flash Sale
 export const deleteFlashSale = async (req, res) => {
     try {
         const { id } = req.params;
@@ -107,7 +98,6 @@ export const deleteFlashSale = async (req, res) => {
         if (!flashSale)
             return res.status(404).json({ message: 'Flash sale not found' });
 
-        // Clear flashSaleId and reset onFlashSale on all affected products
         await Product.updateMany(
             { flashSaleId: flashSale._id },
             {
@@ -116,7 +106,6 @@ export const deleteFlashSale = async (req, res) => {
             }
         );
 
-        // Delete the flash sale
         await flashSale.deleteOne();
 
         res.json({ message: 'Flash sale deleted successfully' });

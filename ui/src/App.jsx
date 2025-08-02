@@ -115,7 +115,13 @@ function App() {
           dispatch(getDefaultCard());
         }
       } catch (error) {
-        console.error('App initialization error:', error);
+        if (error == "No refresh token") {
+          dispatch(fetchWishlist());
+          dispatch(fetchCart());
+          dispatch(getAppliedCoupon());
+        } else {
+          console.error('App initialization error:', error);
+        }
       } finally {
         setInitializing(false);
       }

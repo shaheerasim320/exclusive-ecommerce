@@ -100,7 +100,7 @@ export const removeCoupon = createAsyncThunk(
 
 const calculateSubtotal = (cartItems) => {
     return cartItems.reduce((total, item) => {
-        const itemPrice = item.product?.discount > 0 ? Math.round(calculateDiscountPrice(item.product?.price, item.product?.discount)) : item.product?.price;
+        const itemPrice = item.product?.flashSaleDiscount > 0 ? Math.round(calculateDiscountPrice(item.product?.price, item.product?.flashSaleDiscount)) : item.product?.discount > 0 ? Math.round(calculateDiscountPrice(item.product?.price, item.product?.discount)) : item.product?.price;
         return total + itemPrice * item.quantity;
     }, 0);
 };

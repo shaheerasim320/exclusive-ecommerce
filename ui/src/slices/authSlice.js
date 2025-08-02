@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/axiosInstance";
 
-// -------------------- Thunks --------------------
-
-// Login
 export const login = createAsyncThunk("auth/login", async (credentials, { rejectWithValue }) => {
   try {
     const res = await api.post("/users/login", credentials);
@@ -13,7 +10,7 @@ export const login = createAsyncThunk("auth/login", async (credentials, { reject
   }
 });
 
-// Refresh token
+
 export const refreshAccessToken = createAsyncThunk("auth/refreshAccessToken", async (_, { rejectWithValue }) => {
   try {
     const res = await api.post("/users/refresh-access-token");
@@ -23,7 +20,6 @@ export const refreshAccessToken = createAsyncThunk("auth/refreshAccessToken", as
   }
 });
 
-// Logout
 export const logout = createAsyncThunk("auth/logout", async (_, { rejectWithValue }) => {
   try {
     const res = await api.post("/users/logout");
@@ -33,7 +29,6 @@ export const logout = createAsyncThunk("auth/logout", async (_, { rejectWithValu
   }
 });
 
-//Refresh User
 export const refreshUser = createAsyncThunk("auth/refreshUser", async (_, { rejectWithValue }) => {
   try {
     const res = await api.get("/users/refresh-user");
@@ -43,7 +38,6 @@ export const refreshUser = createAsyncThunk("auth/refreshUser", async (_, { reje
   }
 });
 
-// Update Profile
 export const updateProfile = createAsyncThunk("auth/updateProfile",async (userData, { rejectWithValue, getState }) => {
   try {
       const res = await api.put("/users/update-profile", userData);
@@ -54,7 +48,6 @@ export const updateProfile = createAsyncThunk("auth/updateProfile",async (userDa
   }
 );
 
-// -------------------- Initial State --------------------
 
 const initialState = {
   user: null,
@@ -63,7 +56,6 @@ const initialState = {
   loading: false
 };
 
-// -------------------- Slice --------------------
 
 const authSlice = createSlice({
   name: "auth",
@@ -82,7 +74,6 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      // -------- Login --------
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -100,7 +91,6 @@ const authSlice = createSlice({
         state.accessToken = null;
       })
 
-      // -------- Refresh Token --------
       .addCase(refreshAccessToken.pending, (state) => {
         state.loading = true;
       })
@@ -114,7 +104,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // -------- Logout --------
       .addCase(logout.pending, (state) => {
         state.loading = true;
       })
@@ -129,7 +118,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // -------- Refresh User --------
       .addCase(refreshUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -147,14 +135,13 @@ const authSlice = createSlice({
         state.accessToken = null;
       })
 
-      // -------- Update Profile --------
       .addCase(updateProfile.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;  // Update the user state with the new profile
+        state.user = action.payload.user;
         state.error = null;
       })
       .addCase(updateProfile.rejected, (state, action) => {
@@ -163,8 +150,6 @@ const authSlice = createSlice({
       });
   }
 });
-
-// -------------------- Exports --------------------
 
 export const { setAccessToken, clearError, setUser } = authSlice.actions;
 export default authSlice.reducer;

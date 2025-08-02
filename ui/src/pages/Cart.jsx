@@ -15,7 +15,7 @@ const Cart = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [couponCode, setCouponCode] = useState('');
-    const { user } = useSelector(state => state.user);
+    const { user } = useSelector(state => state.auth);
     const [processing, setProcessing] = useState(false);
 
     const handleCouponChange = (e) => {
@@ -37,29 +37,38 @@ const Cart = () => {
     };
 
     const handleCheckoutClick = async () => {
-        setProcessing(true);
-        try {
-            const cartItems = items.filter(item => item.product.stock !== 0);
-            const itemsData = cartItems.map(item => ({
-                product: item.product._id,
-                quantity: item.quantity,
-                color: item.color,
-                size: item.size,
-            }));
-            const couponID = coupon ? coupon._id : null;
-            const res = await api.post("/billing/create-billing-record", { items: itemsData, couponID: couponID });
-            if (res.data && res.data.billingId) {
-                const billingPublicId = res.data.billingId;
-                console.log("Billing record created with public ID:", billingPublicId);
+  if (!user) {
+    toast.error("Please log in to proceed to checkout.");
+    navigate('/login', { state: { from: location.pathname } });
+    return;
+  }
 
-                navigate(`/billing?billingID=${billingPublicId}`);
-            }
-        } catch (error) {
-            toast.error("Failed to proceed to checkout. Please try again.");
-        } finally {
-            setProcessing(false);
-        }
-    };
+  setProcessing(true);
+  try {
+    const cartItems = items.filter(item => item.product.stock !== 0);
+    const itemsData = cartItems.map(item => ({
+      product: item.product._id,
+      quantity: item.quantity,
+      color: item.color,
+      size: item.size,
+    }));
+    const couponID = coupon ? coupon._id : null;
+    const res = await api.post("/billing/create-billing-record", {
+      items: itemsData,
+      couponID: couponID,
+    });
+
+    if (res.data && res.data.billingId) {
+      const billingPublicId = res.data.billingId;
+      navigate(`/billing?billingID=${billingPublicId}`);
+    }
+  } catch (error) {
+    toast.error("Failed to proceed to checkout. Please try again.");
+  } finally {
+    setProcessing(false);
+  }
+};
+
 
     const handleUpdateQuantity = async (cartItemId, quantity) => {
         await dispatch(updateProductQuantity({ cartItemId, quantity })).unwrap();

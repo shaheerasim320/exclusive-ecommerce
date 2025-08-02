@@ -133,7 +133,7 @@ export default function SignUpPage() {
               {errorMessage && <div className="text-red-500 text-sm my-3">{errorMessage}</div>}
 
               <button
-                onClick={() => window.location.href = "http://127.0.0.1:5001/exclusive-ecommerce-backend/us-central1/api/v1/users/google"}
+                onClick={() => window.location.href = "http://localhost:8080/api/v1/users/google/callback"}
                 className="w-full bg-white border-2 border-gray-300 rounded-xl py-3 px-4 flex items-center justify-center gap-3 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 mb-6 group"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
