@@ -1,11 +1,11 @@
 {
   "name": "ecommerce-backend",
   "version": "1.0.0",
-  "main": "api/index.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon api/index.js"
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",

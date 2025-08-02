@@ -3,28 +3,28 @@ import mongoose from "mongoose"
 import dotenv from "dotenv";
 import cors from "cors"
 import cookieParser from "cookie-parser";
-import productRoutes from "../routes/productRoutes.js"
-import userRoutes from "../routes/userRoutes.js"
-import cartRoutes from "../routes/cartRoutes.js"
-import couponRoutes from "../routes/couponRoutes.js"
-import wishlistRoutes from "../routes/wishlistRoutes.js"
-import imageRoutes from "../routes/imageRoutes.js";
-import { verifyAccessToken, verifyAdmin } from "../middlewares/authMiddleware.js"
-import billingRoutes from "../routes/billingRoutes.js"
-import { cleanupExpiredBillings } from "../utils/billingCleanup.js";
-import paymentRoutes from "../routes/paymentRoutes.js"
-import orderRoutes from "../routes/orderRoutes.js"
-import cardRoutes from "../routes/cardRoutes.js"
-import addressRoutes from "../routes/addressRoutes.js"
-import categoryRoutes from "../routes/categoryRoutes.js"
-import adminRoutes from "../routes/adminRoutes.js"
-import flashSaleRoutes from "../routes/flashSaleRoutes.js"
-import { assignGuestId } from "../middlewares/assignGuestID.js";
+import productRoutes from "./routes/productRoutes.js"
+import userRoutes from "./routes/userRoutes.js"
+import cartRoutes from "./routes/cartRoutes.js"
+import couponRoutes from "./routes/couponRoutes.js"
+import wishlistRoutes from "./routes/wishlistRoutes.js"
+import imageRoutes from "./routes/imageRoutes.js";
+import { verifyAccessToken, verifyAdmin } from "./middlewares/authMiddleware.js"
+import billingRoutes from "./routes/billingRoutes.js"
+import { cleanupExpiredBillings } from "./utils/billingCleanup.js";
+import paymentRoutes from "./routes/paymentRoutes.js"
+import orderRoutes from "./routes/orderRoutes.js"
+import cardRoutes from "./routes/cardRoutes.js"
+import addressRoutes from "./routes/addressRoutes.js"
+import categoryRoutes from "./routes/categoryRoutes.js"
+import adminRoutes from "./routes/adminRoutes.js"
+import flashSaleRoutes from "./routes/flashSaleRoutes.js"
+import { assignGuestId } from "./middlewares/assignGuestID.js";
 import cron from "node-cron"
-import cleanGuestData from "../cron/cleanGuestData.js";
-import cleanupBillings from "../cron/cleanupBillings.js";
+import cleanGuestData from "./cron/cleanGuestData.js";
+import cleanupBillings from "./cron/cleanupBillings.js";
 import serverless from "serverless-http"
-import extendOrRecycleFlashSales from "../cron/extendFlashSales.js";
+import extendOrRecycleFlashSales from "./cron/extendFlashSales.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 8080
