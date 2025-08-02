@@ -11,16 +11,14 @@ async function extendOrRecycleFlashSales() {
     });
 
     for (const flashSale of expiredFlashSales) {
-      // Extend by 6 days
       const newStart = new Date(currentDate);
-      const newEnd = new Date(currentDate.getTime() + 6 * 24 * 60 * 60 * 1000); // +6 days
+      const newEnd = new Date(currentDate.getTime() + 6 * 24 * 60 * 60 * 1000);
 
       flashSale.startTime = newStart;
       flashSale.endTime = newEnd;
-      flashSale.isActive = true; // Ensure it's still marked active
+      flashSale.isActive = true;
       await flashSale.save();
 
-      // Optionally ensure the products are still marked on flash sale
       const productIds = flashSale.products.map(p => p.product);
       await Product.updateMany(
         { _id: { $in: productIds } },
