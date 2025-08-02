@@ -27,7 +27,7 @@ export const store = configureStore({
         category: categorySlice,
         image: imageSlice,
         auth: authSlice,
-        flashSales:flashSaleSlice
+        flashSale:flashSaleSlice
     }
 });
 

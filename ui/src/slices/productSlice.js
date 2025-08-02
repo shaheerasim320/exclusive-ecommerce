@@ -16,7 +16,7 @@ export const fetchProducts = createAsyncThunk(
     "products/fetchProducts",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get("http://localhost:8080/api/v1/products/products");
+            const response = await api.get("/products");
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Failed to fetch products")
@@ -29,19 +29,10 @@ export const fetchAllProducts = createAsyncThunk(
     "products/fetchAllProducts",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get("http://localhost:8080/api/v1/products/get-all-products", { withCredentials: true });
+            const response = await api.get("/products/get-all");
             return response.data;
         } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.get("http://localhost:8080/api/v1/products/get-all-products", { withCredentials: true });
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch all products");
+            return rejectWithValue(error.response?.data?.message || "Failed to fetch products")
         }
     }
 );
@@ -51,10 +42,10 @@ export const fetchBestSellingProducts = createAsyncThunk(
     "products/fetchBestSellingProducts",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get("http://localhost:8080/api/v1/products/best-selling-products");
+            const response = await api.get("/products/best-selling-products");
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch best selling products")
+            return rejectWithValue(error.response?.data?.message || "Failed to fetch products")
         }
     }
 );
@@ -63,7 +54,7 @@ export const fetchProductByID = createAsyncThunk(
     "products/fetchProductByID",
     async (id, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/v1/products/products/${id}`)
+            const response = await api.get(`/products/${id}`)
             return response.data
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Failed to fetch product")
@@ -73,28 +64,11 @@ export const fetchProductByID = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
     "products/updateProduct",
-    async ({ productID, updatedData }, { rejectWithValue, dispatch }) => {
+    async ({ productID, updatedData }, { rejectWithValue }) => {
         try {
-            const response = await axios.put(
-                `http://localhost:8080/api/v1/products/product/${productID}`,
-                updatedData,
-                { withCredentials: true }
-            );
+            const response = await api.put(`/products/${productID}`, updatedData);
             return response.data;
         } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.put(
-                        `http://localhost:8080/api/v1/products/product/${productID}`,
-                        updatedData,
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
             return rejectWithValue(error.response?.data?.message || "Failed to update product data");
         }
     }
@@ -104,26 +78,9 @@ export const addProduct = createAsyncThunk(
     "products/addProduct",
     async ({ productData }, { rejectWithValue, dispatch }) => {
         try {
-            const response = await axios.post(
-                "http://localhost:8080/api/v1/products/products",
-                productData,
-                { withCredentials: true }
-            );
+            const response = await api.post("/products/", productData);
             return response.data;
         } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.post(
-                        "http://localhost:8080/api/v1/products/products",
-                        productData,
-                        { withCredentials: true }
-                    );
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
             return rejectWithValue(error.response?.data?.message || "Failed to add product");
         }
     }
@@ -133,18 +90,9 @@ export const deleteProduct = createAsyncThunk(
     "products/deleteProduct",
     async ({ productID }, { rejectWithValue, dispatch }) => {
         try {
-            const response = await axios.delete(`http://localhost:8080/api/v1/products/products/${productID}`, { withCredentials: true })
+            const response = await api.delete(`/products/${productID}`)
             return response.data;
         } catch (error) {
-            if (error.response?.status === 401) {
-                try {
-                    await dispatch(refreshAccessToken()).unwrap();
-                    const retryResponse = await axios.delete(`http://localhost:8080/api/v1/products/products/${productID}`, { withCredentials: true })
-                    return retryResponse.data;
-                } catch (refreshError) {
-                    return rejectWithValue("Session expired. Please log in again.");
-                }
-            }
             return rejectWithValue(error.response?.data?.message || "Failed to delete product");
         }
     }

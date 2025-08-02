@@ -9,12 +9,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { startTimer, updateTimer } from "../slices/timerSlice";
 import Loader from "../components/Loader"
 import ErrorModal from "../components/modals/ErrorModal";
-// import { addItemToWishlist, getWishlistItems, removeFromWishlist } from "../slices/wishlistSlice";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import { addItemToCart, getCartItems } from "../slices/cartSlice";
 import { clearDelayedAction } from "../slices/userSlice";
-import { getHirearcialDropDownCategories, getMainCategories, getSubCategories } from "../slices/CategorySlice";
 import { addToWishlist, removeFromWishlist } from "../slices/wishlistSlice";
 import { addToCart, updateProductQuantity } from "../slices/cartSlice";
 
@@ -48,10 +45,10 @@ const Home = () => {
     const hasRun = useRef(false)
     const { mainCategories, loading: categoryLoading, subCategories, hirearcialDropDownCategories } = useSelector(state => state.category)
     const [hoveredIndex, setHoveredIndex] = useState(null);
-    const { flashSales, error: flashSaleError } = useSelector((state) => state.flashSales);
+    const { flashSale, error: flashSaleError } = useSelector((state) => state.flashSale);
     const [flashSaleProducts, setFlashSaleProducts] = useState([]);
 
-
+    // console.log(flashSaleProducts);
     useEffect(() => {
         if (user && delayedAction && !hasRun.current) {
             if (delayedAction.type == "wishlist") {
@@ -82,13 +79,11 @@ const Home = () => {
 
 
     useEffect(() => {
-        if (flashSales?.length > 0) {
-            flashSales.forEach((sale, index) => {
-                // Use unique id for flash sale timers (e.g., 1000 + index + 1 to avoid conflicts with static timerArray)
-                dispatch(startTimer({ id: 1000 + index + 1, time: sale.timerArray[0].time }));
-            });
+        if (flashSale) {
+            dispatch(startTimer({ id: 1000, time: flashSale.remainingTime }));
+            setFlashSaleProducts(flashSale?.products);
         }
-    }, [flashSales, dispatch]);
+    }, [flashSale, dispatch]);
 
 
 
@@ -123,16 +118,10 @@ const Home = () => {
         await dispatch(addToCart({ product: productID, quantity, color, size })).unwrap();
         toast.success("Product added to cart");
     };
-    useEffect(() => {
-        if (flashSales?.length > 0) {
-            setFlashSaleProducts(flashSales[0]?.products);
-        }
-    }, [flashSales])
 
-    
 
-    const flashSaleTimer = timers.find((timer) => timer.id === 1001) || { time: 0 };
-    console.log(flashSaleProducts);
+
+    const flashSaleTimer = timers.find((timer) => timer.id === 1000) || { time: 0 };
     return (
         <div className="min-h-screen">
             {loading || cartLoading || categoryLoading ? <div className="h-screen flex justify-center items-center"><Loader /></div> : ""}
@@ -274,7 +263,7 @@ const Home = () => {
                             {flashSaleProducts.length > 0 ? (
                                 flashSaleProducts.slice(flashProductsStartIndex, flashProductsStartIndex + 5).map((product, index) => (
                                     <ProductCard
-                                        product={product.product}
+                                        product={product}
                                         key={product._id}
                                         onWishlistToggle={handleWishlistToggle}
                                         onCartClick={handleAddToCartClick}

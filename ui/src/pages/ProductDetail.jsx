@@ -241,17 +241,17 @@ const ProductDetail = () => {
                         </div>
                         {/* Price */}
                         <div className="price mb-4">
-                            {product && product?.discount && product?.discount > 0 ? (
+                            {product && product?.discount && (product?.discount > 0 || product?.flashSaleDiscount > 0) ? (
                                 <>
                                     <span className="text-xl md:text-2xl font-semibold">
-                                        ${Math.round(calculateDiscountPrice(product.price, product.discount))}
+                                        ${product?.flashSaleDiscount > 0 ? Math.round(calculateDiscountPrice(product.price, product.flashSaleDiscount)) : Math.round(calculateDiscountPrice(product.price, product.discount))}
                                     </span>
                                     <div className="mt-1">
                                         <span className='text-sm md:text-base text-[#888888]'>
                                             <del>${product.price}</del>
                                         </span>
                                         <span className='ml-3 text-sm md:text-base text-[#DB4444] font-semibold'>
-                                            -{product.discount}%
+                                            -{product?.flashSaleDiscount > 0 ? product?.flashSaleDiscount : product.discount}%
                                         </span>
                                     </div>
                                 </>

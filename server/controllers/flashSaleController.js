@@ -101,64 +101,63 @@ export const updateFlashSale = async (req, res) => {
 
 // ✅ Delete Flash Sale
 export const deleteFlashSale = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const flashSale = await FlashSale.findById(id);
-    if (!flashSale)
-      return res.status(404).json({ message: 'Flash sale not found' });
+    try {
+        const { id } = req.params;
+        const flashSale = await FlashSale.findById(id);
+        if (!flashSale)
+            return res.status(404).json({ message: 'Flash sale not found' });
 
-    // Clear flashSaleId and reset onFlashSale on all affected products
-    await Product.updateMany(
-      { flashSaleId: flashSale._id },
-      {
-        $unset: { flashSaleId: '' },
-        $set: { onFlashSale: false }
-      }
-    );
+        // Clear flashSaleId and reset onFlashSale on all affected products
+        await Product.updateMany(
+            { flashSaleId: flashSale._id },
+            {
+                $unset: { flashSaleId: '' },
+                $set: { onFlashSale: false }
+            }
+        );
 
-    // Delete the flash sale
-    await flashSale.deleteOne();
+        // Delete the flash sale
+        await flashSale.deleteOne();
 
-    res.json({ message: 'Flash sale deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to delete flash sale', error: err.message });
-  }
+        res.json({ message: 'Flash sale deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to delete flash sale', error: err.message });
+    }
 };
 
 export const getActiveFlashSale = async (req, res) => {
-    try {
-        const now = new Date();
+  try {
+    const now = new Date();
 
-        const flashSale = await FlashSale.findOne({
-            startTime: { $lte: now },
-            endTime: { $gte: now },
-            isActive: true,
-        }).populate('products.product');
+    const flashSale = await FlashSale.findOne({
+      startTime: { $lte: now },
+      endTime: { $gte: now },
+      isActive: true,
+    }).populate('products.product');
 
-        if (!flashSale) {
-            return res.status(404).json({ message: 'No active flash sale.' });
-        }
-
-        const remainingTime = flashSale.endTime - now;
-
-        const response = {
-            title: flashSale.title,
-            startTime: flashSale.startTime,
-            endTime: flashSale.endTime,
-            remainingTime: remainingTime,
-            products: flashSale.products
-                .filter(p => p.product) 
-                .map(p => {
-                    const productData = p.product.toObject();
-                    return {
-                        ...productData,
-                        flashSaleDiscount: p.discount
-                    };
-                })
-        };
-
-        res.json(response);
-    } catch (err) {
-        res.status(500).json({ message: 'Server Error', error: err.message });
+    if (!flashSale) {
+      return res.status(404).json({ message: 'No active flash sale.' });
     }
+
+    const remainingMs = flashSale.endTime.getTime() - now.getTime(); 
+    const remainingTime = Math.floor(remainingMs / 1000); 
+
+    const response = {
+      title: flashSale.title,
+      startTime: flashSale.startTime,
+      endTime: flashSale.endTime,
+      remainingTime,
+      products: flashSale.products
+        .filter(p => p.product)
+        .map(p => ({
+          ...p.product.toObject(),
+          flashSaleDiscount: p.discount
+        }))
+    };
+
+    res.json(response);
+  } catch (err) {
+    console.error('Error fetching flash sale:', err);
+    res.status(500).json({ message: 'Server Error', error: err.message });
+  }
 };

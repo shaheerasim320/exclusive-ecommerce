@@ -79,7 +79,7 @@ import {
   getSavedCards
 } from './slices/cardSlice';
 
-import { fetchActiveFlashSales } from './slices/flashSaleSlice';
+import { fetchActiveFlashSale } from './slices/flashSaleSlice';
 import SearchResults from './pages/SearchResults';
 
 function App() {
@@ -95,7 +95,7 @@ function App() {
         dispatch(getSubCategories());
         dispatch(getHirearcialDropDownCategories());
         dispatch(fetchProducts());
-        dispatch(fetchActiveFlashSales());
+        dispatch(fetchActiveFlashSale());
         dispatch(fetchBestSellingProducts());
         dispatch(fetchAllProducts());
 
