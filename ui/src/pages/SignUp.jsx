@@ -18,9 +18,9 @@ export default function SignUpPage() {
     phoneNumber: '',
     gender: ''
   });
-  const [errorMessage, setErrorMessage] = useState(''); // For storing error message
+  const [errorMessage, setErrorMessage] = useState(''); 
 
-  // Handle input change for the form fields
+  
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -46,7 +46,7 @@ export default function SignUpPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-    setIsSubmitting(true); // Start loading
+    setIsSubmitting(true); 
 
     const { fullName, email, password, phoneNumber, gender } = formData;
 

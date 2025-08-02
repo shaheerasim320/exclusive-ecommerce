@@ -20,6 +20,7 @@ import categoryRoutes from "./routes/categoryRoutes.js"
 import adminRoutes from "./routes/adminRoutes.js"
 import flashSaleRoutes from "./routes/flashSaleRoutes.js"
 import { assignGuestId } from "./middlewares/assignGuestID.js";
+import { dbConnectMiddleware } from "./middlewares/dbConnectMiddleware.js";
 import cron from "node-cron"
 import cleanGuestData from "./cron/cleanGuestData.js";
 import cleanupBillings from "./cron/cleanupBillings.js";
@@ -30,14 +31,14 @@ dotenv.config();
 const PORT = process.env.PORT || 8080
 const app = express()
 
-// app.use(express.json());
+app.use(express.json());
 
-// app.use(cookieParser())
+app.use(cookieParser())
 
-// app.use(cors({
-//     origin: true,
-//     credentials: true
-// }))
+app.use(cors({
+    origin: true,
+    credentials: true
+}))
 
 // app.get("/api/cron/guest-cleanup", async (req, res) => {
 //     try {
@@ -70,50 +71,43 @@ const app = express()
 //     }
 // });
 
-// mongoose.connect(process.env.MONGODB_URI, { dbName: "exclusive-ecommerce" })
-//     .then(conn => console.log(`MongoDB Connected With Server: ${conn.connection.host}`))
-//     .catch(err => console.log(`Error Occured: ${err}`))
+app.use(dbConnectMiddleware);
 
-// app.use("/api/v1/products", productRoutes)
+app.use("/api/v1/products", productRoutes)
 
-// app.use("/api/v1/users", userRoutes)
+app.use("/api/v1/users", userRoutes)
 
-// app.use("/api/v1/cart", assignGuestId, cartRoutes)
+app.use("/api/v1/cart", assignGuestId, cartRoutes)
 
-// app.use("/api/v1/coupons", couponRoutes)
+app.use("/api/v1/coupons", couponRoutes)
 
-// app.use("/api/v1/wishlist", assignGuestId, wishlistRoutes)
+app.use("/api/v1/wishlist", assignGuestId, wishlistRoutes)
 
-// app.use("/api/v1/image", imageRoutes);
+app.use("/api/v1/image", imageRoutes);
 
-// app.use("/api/v1/billing", verifyAccessToken, billingRoutes)
+app.use("/api/v1/billing", verifyAccessToken, billingRoutes)
 
-// app.use("/api/v1/payment", verifyAccessToken, paymentRoutes)
+app.use("/api/v1/payment", verifyAccessToken, paymentRoutes)
 
-// app.use("/api/v1/orders", verifyAccessToken, orderRoutes)
+app.use("/api/v1/orders", verifyAccessToken, orderRoutes)
 
-// app.use("/api/v1/card", verifyAccessToken, cardRoutes)
+app.use("/api/v1/card", verifyAccessToken, cardRoutes)
 
-// app.use("/api/v1/address", verifyAccessToken, addressRoutes)
+app.use("/api/v1/address", verifyAccessToken, addressRoutes)
 
-// app.use("/api/v1/category", categoryRoutes)
+app.use("/api/v1/category", categoryRoutes)
 
-// app.use("/api/v1/admin", verifyAccessToken, verifyAdmin, adminRoutes)
+app.use("/api/v1/admin", verifyAccessToken, verifyAdmin, adminRoutes)
 
-// app.use("/api/v1/flashSale", flashSaleRoutes)
-
-
-// app.use("/", (req, res) => {
-//     res.status(200).json({message:"Welcome To Exclusive Ecommerce"})
-// })
-// app.use((req, res) => {
-//     res.status(404).json({ message: "Route not found" });
-// });
+app.use("/api/v1/flashSale", flashSaleRoutes)
 
 app.get("/", (req, res) => {
-    res.status(200).json({ message: "Test Successful" });
-});
+    return res.send("Backend Is Running")
+})
 
-export default serverless(app);
+app.listen(PORT, () => {
+    console.log(`Server is running on ${PORT}`)
+})
+
 
 

@@ -8,11 +8,10 @@ export const injectStore = (_store) => {
 };
 
 const api = axios.create({
-    baseURL: "http://localhost:8080/api/v1",
+    baseURL: "https://exclusive-ecommerce-backend.vercel.app/api/v1",
     withCredentials: true,
 });
 
-// Add token to request headers
 api.interceptors.request.use(
     (config) => {
         const state = store.getState();
@@ -25,7 +24,6 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Handle token refresh
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -40,9 +38,6 @@ api.interceptors.response.use(
 
             try {
                 const { accessToken } = await store.dispatch(refreshAccessToken()).unwrap();
-
-                // Update token in Redux store (already done in the slice if refreshAccessToken is correct)
-                // Retry original request with new token
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
