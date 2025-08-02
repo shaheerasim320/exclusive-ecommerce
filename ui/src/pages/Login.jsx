@@ -135,7 +135,7 @@ export default function LoginPage() {
               )}
 
               <button
-                onClick={() => window.location.href = "http://localhost:8080/api/v1/users/google"}
+                onClick={() => window.location.href = "https://exclusive-ecommerce-backend.vercel.app/api/v1/users/google"}
                 className="w-full bg-white border-2 border-gray-300 rounded-xl py-3 px-4 flex items-center justify-center gap-3 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 mb-6 group"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
