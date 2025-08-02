@@ -53,7 +53,7 @@ import {
   getHirearcialDropDownCategories,
   getMainCategories,
   getSubCategories
-} from './slices/CategorySlice';
+} from './slices/categorySlice';
 
 import {
   fetchAllProducts,
