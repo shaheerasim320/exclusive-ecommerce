@@ -7,7 +7,7 @@ import MergeModal from '../components/modals/MergeModal';
 import { useLocation, useNavigate } from "react-router-dom";
 import { getWithExpiry } from '../utils/expiringLocalStorage';
 import api from '../api/axiosInstance';
-import { getDefaultBillingAddress, getDefaultShippingAddress } from '../slices/addressSlice';
+import { getDefaultBillingAddress, getDefaultShippingAddress, getSavedAddresses } from '../slices/addressSlice';
 import { getCancelledOrders, getPlacedOrders, getReturnedOrders } from '../slices/orderSlice';
 import { getDefaultCard, getSavedCards } from '../slices/cardSlice';
 
@@ -45,34 +45,33 @@ export default function LoginPage() {
     }
 
     try {
-      const result = await dispatch(login(formData)).unwrap();
+      const payload = await dispatch(login(formData)).unwrap();
 
-      if (login.fulfilled.match(result)) {
-        setErrorMessage("");
-        dispatch(setAccessToken(result.payload.accessToken));
-        dispatch(getSavedAddresses());
-        dispatch(getDefaultShippingAddress());
-        dispatch(getDefaultBillingAddress());
-        dispatch(getPlacedOrders());
-        dispatch(getReturnedOrders());
-        dispatch(getCancelledOrders());
-        dispatch(getSavedCards());
-        dispatch(getDefaultCard());
+      setErrorMessage("");
 
-        const guestWishlist = await dispatch(fetchWishlist()).unwrap();
-        const guestCart = await dispatch(fetchCart()).unwrap();
-        const shouldShowModal = guestWishlist.length > 0 || guestCart.length > 0;
+      dispatch(setAccessToken(payload.accessToken));
+      dispatch(getSavedAddresses());
+      dispatch(getDefaultShippingAddress());
+      dispatch(getDefaultBillingAddress());
+      dispatch(getPlacedOrders());
+      dispatch(getReturnedOrders());
+      dispatch(getCancelledOrders());
+      dispatch(getSavedCards());
+      dispatch(getDefaultCard());
 
-        setShowMergeModal(shouldShowModal);
-        if (!shouldShowModal) {
-          performRedirect();
-        }
-      } else {
-        setErrorMessage(result.payload || "Login failed. Please try again.");
+      const guestWishlist = await dispatch(fetchWishlist()).unwrap();
+      const guestCart = await dispatch(fetchCart()).unwrap();
+      const shouldShowModal = guestWishlist.length > 0 || guestCart.length > 0;
+
+      setShowMergeModal(shouldShowModal);
+
+      if (!shouldShowModal) {
+        performRedirect();
       }
     } catch (err) {
-      setErrorMessage("Something went wrong. Please try again.");
+      setErrorMessage(err?.message || "Login failed. Please try again.");
     }
+
 
   };
   const performRedirect = async () => {

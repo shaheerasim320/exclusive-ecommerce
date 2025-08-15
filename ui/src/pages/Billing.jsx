@@ -21,6 +21,7 @@ import ChangeCardModal from "../components/modals/ChangeCardModal";
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import api from "../api/axiosInstance";
+import { getPlacedOrders } from "../slices/orderSlice";
 
 const stripePromise = loadStripe("pk_test_51QrdnnC82WimU32rhRV2qhtHQ8IAinPoxp2ru8X5J1W3AyDlIf7M9zm9tFdnceVITHu5Zw9gWt36FhjxqP2X8wNf00vqPlat2B");
 
@@ -278,6 +279,7 @@ const Billing = () => {
             const res = await api.post("/orders/place-order", order);
             if (res.status === 201) {
                 await api.delete(`/billing/delete-billing-by-id/${billingID}`);
+                await dispatch(getPlacedOrders()).unwrap()
                 setIsModalOpen(true);
             }
         } catch (error) {

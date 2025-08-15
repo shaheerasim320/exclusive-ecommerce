@@ -4,7 +4,7 @@ import Aside from '../components/Aside'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
-import { getSavedAddresses, setDefaultBillingAddress, setDefaultShippingAddress } from '../slices/addressSlice'
+import { getDefaultBillingAddress, getDefaultShippingAddress, getSavedAddresses, setDefaultBillingAddress, setDefaultShippingAddress } from '../slices/addressSlice'
 
 const AddressBook = () => {
     const { user } = useSelector(state => state.auth)
@@ -24,10 +24,12 @@ const AddressBook = () => {
         if (isDefaultBillingAddressClicked) {
             await dispatch(setDefaultBillingAddress({ addressId: selectedAddress })).unwrap();
             await dispatch(getSavedAddresses()).unwrap()
+            await dispatch(getDefaultBillingAddress()).unwrap()
             setIsDefaultBillingAddressClicked(false);
         } else if (isDefaultShippingAddressClicked) {
             await dispatch(setDefaultShippingAddress({ addressId: selectedAddress })).unwrap();
             await dispatch(getSavedAddresses()).unwrap()
+            await dispatch(getDefaultShippingAddress()).unwrap()
             setIsDefaultShippingAddressClicked(false);
         } else {
             navigate("/address?create=true")

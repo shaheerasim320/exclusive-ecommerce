@@ -2,10 +2,9 @@ import React from 'react'
 import { calculateDiscountPrice } from '../functions/DiscountPriceCalculator'
 
 const BillingProductRow = ({ product, quantity, color, size, adjustWidth = false }) => {
-    // console.log(product)
     return (
-        <tr className=" my-[12px] px-[7px] flex items-center justify-between shadow ">
-            <td>
+        <div className=" my-[12px] px-[7px] flex items-center justify-between shadow ">
+            <div>
                 {/* Product Title & Image */}
                 <div className={`product-title-image flex items-center gap-[13px] ${adjustWidth ? "w-[171px]" : ""}`}>
                     {/* Image */}
@@ -25,8 +24,8 @@ const BillingProductRow = ({ product, quantity, color, size, adjustWidth = false
                     {/* Title  End Here*/}
                 </div>
                 {/* Product Title & Image Ends Here*/}
-            </td>
-            <td colSpan={2} className="h-[24px] w-[249px] flex justify-between">
+            </div>
+            <div colSpan={2} className="h-[24px] w-[249px] flex justify-between">
                 {/* Price*/}
                 <div className="price">
                     {product?.flashSaleDiscount > 0 ? (<div className="flex gap-[10px]"><span className="text-[16px] text-[#DB4444]">${Math.round(calculateDiscountPrice(product.price, product.flashSaleDiscount))}</span><span className="text-[16px] text-[#888888]"><del>${product.price}</del></span></div>) : product?.discount > 0
@@ -51,8 +50,8 @@ const BillingProductRow = ({ product, quantity, color, size, adjustWidth = false
                     <div className="value"><span>{product && quantity}</span></div>
                 </div>
                 {/* Qty Ends Here*/}
-            </td>
-        </tr>
+            </div>
+        </div>
     )
 }
 

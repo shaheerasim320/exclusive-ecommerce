@@ -37,37 +37,37 @@ const Cart = () => {
     };
 
     const handleCheckoutClick = async () => {
-  if (!user) {
-    toast.error("Please log in to proceed to checkout.");
-    navigate('/login', { state: { from: location.pathname } });
-    return;
-  }
+        if (!user) {
+            toast.error("Please log in to proceed to checkout.");
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
 
-  setProcessing(true);
-  try {
-    const cartItems = items.filter(item => item.product.stock !== 0);
-    const itemsData = cartItems.map(item => ({
-      product: item.product._id,
-      quantity: item.quantity,
-      color: item.color,
-      size: item.size,
-    }));
-    const couponID = coupon ? coupon._id : null;
-    const res = await api.post("/billing/create-billing-record", {
-      items: itemsData,
-      couponID: couponID,
-    });
+        setProcessing(true);
+        try {
+            const cartItems = items.filter(item => item.product.stock !== 0);
+            const itemsData = cartItems.map(item => ({
+                product: item.product._id,
+                quantity: item.quantity,
+                color: item.color,
+                size: item.size,
+            }));
+            const couponID = coupon ? coupon._id : null;
+            const res = await api.post("/billing/create-billing-record", {
+                items: itemsData,
+                couponID: couponID,
+            });
 
-    if (res.data && res.data.billingId) {
-      const billingPublicId = res.data.billingId;
-      navigate(`/billing?billingID=${billingPublicId}`);
-    }
-  } catch (error) {
-    toast.error("Failed to proceed to checkout. Please try again.");
-  } finally {
-    setProcessing(false);
-  }
-};
+            if (res.data && res.data.billingId) {
+                const billingPublicId = res.data.billingId;
+                navigate(`/billing?billingID=${billingPublicId}`);
+            }
+        } catch (error) {
+            toast.error("Failed to proceed to checkout. Please try again.");
+        } finally {
+            setProcessing(false);
+        }
+    };
 
 
     const handleUpdateQuantity = async (cartItemId, quantity) => {
@@ -89,19 +89,20 @@ const Cart = () => {
                     <Link to="#">Cart</Link>
                 </div>
                 {/* Cart */}
-                <section className="cart flex flex-col mx-auto">
+                <section className="cart flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="prod-details flex flex-col gap-6">
-                        <div className="product flex flex-col overflow-x-auto">
-                            <table className={items?.length > 0 ? '' : 'hidden'}>
-                                <thead className="header shadow-md">
-                                    <tr className="w-full grid grid-cols-4 min-w-[640px] p-6">
-                                        <th className="font-normal">Product</th>
-                                        <th className="font-normal">Price</th>
-                                        <th className="font-normal">Quantity</th>
-                                        <th className="font-normal">Subtotal</th>
+                        <div className="product flex flex-col">
+                            <table className={items?.length > 0 ? 'w-full' : 'hidden'}>
+                                {/* Hide the table header on small screens */}
+                                <thead className="header shadow-md hidden sm:table-header-group">
+                                    <tr className="w-full grid grid-cols-4 p-6">
+                                        <th className="font-normal text-left">Product</th>
+                                        <th className="font-normal text-left">Price</th>
+                                        <th className="font-normal text-left">Quantity</th>
+                                        <th className="font-normal text-left">Subtotal</th>
                                     </tr>
                                 </thead>
-                                <tbody className="flex flex-col">
+                                <tbody className="flex flex-col sm:table-row-group">
                                     {items?.length > 0 && items.map((item, index) => (
                                         <CartProductRow
                                             key={index}
@@ -117,13 +118,13 @@ const Cart = () => {
                                 </tbody>
                             </table>
                         </div>
-                        <div className={`btns ${items?.length > 0 ? 'flex' : 'hidden'}`}>
+                        <div className={`btns ${items?.length > 0 ? 'flex' : 'hidden'} justify-between mt-4`}>
                             <Link to="/">
-                                <button className="px-12 py-4 border-[1.5px] border-black border-opacity-60 rounded-sm hover:border-opacity-30">Return To Shop</button>
+                                <button className="px-6 sm:px-12 py-3 sm:py-4 border-[1.5px] border-black border-opacity-60 rounded-sm hover:border-opacity-30 text-sm">Return To Shop</button>
                             </Link>
                         </div>
                         <div className={`coupon-check-out ${items?.length > 0 ? "flex" : "hidden"} flex-col lg:flex-row gap-6 justify-between`}>
-                            <div className="coupon flex gap-2">
+                            <div className="coupon flex flex-col sm:flex-row gap-2">
                                 <input type="text" className="w-full sm:w-72 h-14 px-4 border-[1.5px] border-black focus:outline-none" placeholder="Coupon Code" onChange={handleCouponChange} value={couponCode} />
                                 <button className="w-full sm:w-56 h-14 rounded-sm text-white bg-[#DB4444] hover:bg-[#E07575]" onClick={handleCouponClick}>Apply Coupon</button>
                             </div>
@@ -151,7 +152,7 @@ const Cart = () => {
                                     </div>
                                 </div>
                                 <div className="btn flex justify-center">
-                                    <button 
+                                    <button
                                         className="w-full sm:w-56 h-14 rounded-sm text-white bg-[#DB4444] hover:bg-[#E07575] disabled:bg-gray-400 disabled:cursor-not-allowed"
                                         onClick={handleCheckoutClick}
                                         disabled={processing}

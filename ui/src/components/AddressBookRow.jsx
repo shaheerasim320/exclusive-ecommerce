@@ -21,7 +21,7 @@ const AddressBookRow = ({ address, isClick, selectedAddress, onSelect, onEdit })
                 <span>{address.defaultBillingAddress ? "Default Billing Address" : ""}</span>
             </div>
             {/* Actions */}
-            <div className="w-full md:w-auto flex justify-end md:justify-center items-center">
+            <div className="w-full md:w-auto flex justify-end md:justify-end items-center ">
                 {!isClick ? (
                     <span className="text-base text-[#DB4444] hover:text-[#A33737] cursor-pointer" onClick={handleEditButton}>EDIT</span>
                 ) : (

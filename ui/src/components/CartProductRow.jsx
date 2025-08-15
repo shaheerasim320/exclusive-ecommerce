@@ -6,7 +6,6 @@ import Loader from './Loader';
 
 
 const CartProductRow = ({ product, cartItemID, qty, updateQuantity, color, size, onRemove }) => {
-    console.log(product)
     const [quantity, setQuantity] = useState("0" + qty)
     const [increaseSignHovered, setIncreaseSignHovered] = useState(false)
     const [decreaseSignHovered, setDecreaseSignHovered] = useState(false)
@@ -31,43 +30,56 @@ const CartProductRow = ({ product, cartItemID, qty, updateQuantity, color, size,
         updateQuantity(cartItemID, quantity);
     };
     return (
-        <tr className=" py-6 px-8 shadow">
-            {loading && <td className="w-screen flex items-center justify-center"><Loader /></td>}
-            <td className="grid grid-cols-4 items-center">
-                <div className={`product ${loading ? "hidden" : "flex"} items-center`}>
-                    <div className="image flex">
-                        <div className="icon w-14 h-14 flex items-center justify-center select-none">
-                            <img src={product && product?.mainImage} alt="Product Image" />
-                        </div>
-                        <div className="cancel w-5 h-5 bg-[#DB4444] relative top-[1px] right-[57px] rounded-full cursor-pointer select-none" onClick={handleRemove}>
-                            <img src="/images/cancel.svg" alt="cross" className="mx-auto my-[5px]" />
-                        </div>
+        // Changed to a flex container that stacks vertically on mobile
+        <div className="flex flex-col sm:flex-row py-6 px-4 sm:px-8 shadow">
+            {loading && <div className="w-full flex items-center justify-center"><Loader /></div>}
+            
+            {/* Product section */}
+            <div className={`product w-full ${loading ? "hidden" : "flex"} items-center sm:w-2/5`}>
+                <div className="relative">
+                    <div className="icon w-16 h-16 flex items-center justify-center select-none">
+                        <img src={product && product?.mainImage} alt="Product Image" />
                     </div>
-                    <div className="flex flex-col">
-                        <h6 className="title text-[16px] select-none">{product && product?.title}</h6>
-                        {product && product?.stock == 0 ? (<span className="text-[13px] text-[#DB4444]"> Out Of Stock</span>) : ""}
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                            {color && (
-                                <div className="flex items-center gap-1">
-                                    <span className="font-medium">Color:</span>
-                                    <span className="w-4 h-4 rounded-full border border-gray-300" style={{ backgroundColor: color }} title={color}></span>
-                                    <span className="capitalize">{color}</span>
-                                </div>
-                            )}
-                            {size && (
-                                <div className="flex items-center gap-1">
-                                    <span className="font-medium">Size:</span>
-                                    <span className="uppercase">{size}</span>
-                                </div>
-                            )}
-                        </div>
+                    {/* Position the remove button relative to the product image */}
+                    <div className="cancel absolute top-0 left-0 w-5 h-5 bg-[#DB4444] rounded-full cursor-pointer select-none" onClick={handleRemove}>
+                        <img src="/images/cancel.svg" alt="cross" className="mx-auto my-[5px]" />
+                    </div>
+                </div>
+                <div className="flex flex-col ml-4">
+                    <h6 className="title text-[16px] select-none">{product && product?.title}</h6>
+                    {product && product?.stock == 0 ? (<span className="text-[13px] text-[#DB4444]">Out Of Stock</span>) : ""}
+                    <div className="flex items-center gap-4 text-sm text-gray-600 mt-1 flex-wrap">
+                        {color && (
+                            <div className="flex items-center gap-1">
+                                <span className="font-medium">Color:</span>
+                                <span className="w-4 h-4 rounded-full border border-gray-300" style={{ backgroundColor: color }} title={color}></span>
+                                <span className="capitalize">{color}</span>
+                            </div>
+                        )}
+                        {size && (
+                            <div className="flex items-center gap-1">
+                                <span className="font-medium">Size:</span>
+                                <span className="uppercase">{size}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
 
-                    </div>
+            {/* Price, Quantity, and Subtotal sections stacked for mobile */}
+            <div className="w-full sm:w-3/5 flex justify-between items-center mt-4 sm:mt-0">
+                <div className="price text-center w-1/3">
+                    {product?.discount > 0 || product?.flashSaleDiscount > 0 ? (
+                        <div className="flex flex-col gap-1 items-center">
+                            <span className="text-[16px] text-[#DB4444]">${product?.flashSaleDiscount > 0 ? Math.round(calculateDiscountPrice(product.price, product.flashSaleDiscount)) : Math.round(calculateDiscountPrice(product.price, product.discount))}</span>
+                            <span className="text-[14px] text-[#888888]"><del>${product?.price}</del></span>
+                        </div>
+                    ) : (
+                        <div><span className="text-[16px] text-[#DB4444]">${product && product?.price}</span></div>
+                    )}
                 </div>
-                <div className="price text-center">
-                    {product?.discount > 0 || product?.flashSaleDiscount > 0 ? (<div className="flex gap-[10px] justify-center"><span className="text-[16px] text-[#DB4444]">${product?.flashSaleDiscount > 0 ? Math.round(calculateDiscountPrice(product.price, product.flashSaleDiscount)) : Math.round(calculateDiscountPrice(product.price, product.discount))}</span><span className="text-[16px] text-[#888888]"><del>${product?.price}</del></span></div>) : (<div><span className="text-[16px] text-[#DB4444]">${product && product?.price}</span></div>)}
-                </div>
-                <div className="text-center">
+
+                <div className="text-center w-1/3">
                     <select
                         value={qty}
                         onChange={(e) => handleQuantityChange(cartItemID, parseInt(e.target.value))}
@@ -78,17 +90,14 @@ const CartProductRow = ({ product, cartItemID, qty, updateQuantity, color, size,
                         ))}
                     </select>
                 </div>
-                <div className="subtotal text-center">
-                    <span className="text-[16px] select-none">
-                        {product && (product.discount > 0 || product.flashSaleDiscount > 0) ? Math.round((product.flashSaleDiscount > 0 ? calculateDiscountPrice(product.price, product.flashSaleDiscount) : calculateDiscountPrice(product.price, product.discount)) * qty) : product.price * qty}
+                
+                <div className="subtotal text-center w-1/3">
+                    <span className="text-[16px] select-none font-semibold">
+                        ${product && (product.discount > 0 || product.flashSaleDiscount > 0) ? Math.round((product.flashSaleDiscount > 0 ? calculateDiscountPrice(product.price, product.flashSaleDiscount) : calculateDiscountPrice(product.price, product.discount)) * qty) : product.price * qty}
                     </span>
-
                 </div>
-            </td>
-            <td colSpan={3} className={`${loading ? "hidden" : "flex"} items-center justify-between `}>
-
-            </td>
-        </tr>
+            </div>
+        </div>
     );
 }
 

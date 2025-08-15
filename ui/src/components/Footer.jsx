@@ -26,13 +26,12 @@ const Footer = () => {
             const res = await api.post("/users/subscribe-newsletter", {
                 email: trimmedEmail
             });
-            console.log(res)
             setIsModalOpen(true);
             setEmail('');
         } catch (error) {
             toast.error("Subscription failed")
         } finally {
-            setLoading(false); // End loading
+            setLoading(false);
         }
     };
     return (

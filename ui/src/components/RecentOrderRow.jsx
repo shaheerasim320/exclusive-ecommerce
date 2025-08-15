@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { calculateDiscountPrice } from '../functions/DiscountPriceCalculator'
 
 const RecentOrderRow = ({ order }) => {
-    console.log(order)
     const date = new Date(order?.orderDate)
     const [total, setTotal] = useState("")
     useEffect(() => {
@@ -10,35 +9,42 @@ const RecentOrderRow = ({ order }) => {
             setTotal(order.totalAmount)
         }
     })
+
     return (
-        // Adjusted for full width on small screens, flexible padding, and dynamic height
-        <tr className="w-full px-4 py-3 flex items-center shadow-sm border-b border-gray-200 last:border-b-0 rounded-md">
-            {/* Order ID: Responsive width */}
-            <td className="text-sm md:text-base w-1/4 break-words">
-                {order?.orderId ? `${order.orderId.substring(0, 8)}...` : 'N/A'}
-            </td>
-            {/* Grouped details: Responsive width and flex layout */}
-            <td className="w-3/4"> {/* Occupy remaining width */}
-                <div className="details flex flex-col sm:flex-row w-full justify-between items-start sm:items-center gap-2">
-                    {/* Date: Responsive font size */}
-                    <span className="text-xs sm:text-sm md:text-base">{String(new Date(order?.orderDate).getMonth() + 1).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getDate()).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getFullYear())}</span>
-                    <div className="flex gap-2 items-center">
-                        {/* Product Image: Responsive sizing and placeholder */}
-                        <div className="icon w-10 h-10 flex items-center justify-center flex-shrink-0">
-                            <img
-                                src={order?.products?.[0]?.image || "https://placehold.co/40x40/cccccc/000000?text=Product"} // Placeholder image
-                                alt="product"
-                                className="max-w-full max-h-full object-contain rounded"
-                            />
-                        </div>
-                        {/* "& More" text: Responsive visibility and margin */}
-                        <span className={`${order?.products?.length > 1 ? "" : "hidden"} text-xs sm:text-sm md:text-base ml-1`}>&amp; More</span>
+        // Changed to a div for better layout control and responsiveness
+        <div className="w-full flex flex-col sm:flex-row items-start sm:items-center p-4 border-b border-gray-200 last:border-b-0">
+            {/* Order ID and Date - Grouped for Mobile */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:w-1/4 mb-2 sm:mb-0">
+                <span className="text-sm font-medium text-gray-800">
+                    {order?.orderId ? `${order.orderId.substring(0, 8)}...` : 'N/A'}
+                </span>
+                <span className="text-xs text-gray-500 mt-1 sm:hidden">
+                    {String(new Date(order?.orderDate).getMonth() + 1).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getDate()).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getFullYear())}
+                </span>
+            </div>
+
+            {/* Product Image and Total - Grouped for Mobile */}
+            <div className="flex items-center justify-between w-full sm:w-3/4">
+                <div className="flex items-center gap-2">
+                    {/* Product Image */}
+                    <div className="icon w-8 h-8 flex-shrink-0">
+                        <img
+                            src={order?.products?.[0]?.image || "https://placehold.co/32x32/cccccc/000000?text=Product"}
+                            alt="product"
+                            className="w-full h-full object-contain rounded"
+                        />
                     </div>
-                    {/* Total: Responsive font size */}
-                    <span className="text-sm md:text-base font-semibold">${total}</span>
+                    {/* "& More" text */}
+                    <span className={`${order?.products?.length > 1 ? "" : "hidden"} text-xs text-gray-600`}>& More</span>
                 </div>
-            </td>
-        </tr>
+                
+                {/* Total */}
+                <span className="text-base font-semibold text-gray-900">${total}</span>
+            </div>
+
+            {/* Date - Visible only on larger screens */}
+            <span className="hidden sm:block text-sm text-gray-500 ml-auto">{String(new Date(order?.orderDate).getMonth() + 1).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getDate()).padStart(2, "0") + "/" + String(new Date(order?.orderDate).getFullYear())}</span>
+        </div>
     );
 }
 
