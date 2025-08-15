@@ -182,7 +182,7 @@ const Home = () => {
                 {/* Hero Section Ends Here */}
 
                 {/* Flash Sales Section Starts Here */}
-                <section className={`flash-sales w-full px-4 md:px-8 lg:max-w-[1170px] mx-auto mt-16 md:mt-24 lg:mt-[134px]`}>
+                <section className={`flash-sales w-full px-4 md:px-8 lg:max-w-[1170px] mx-auto mt-16 md:mt-24 lg:mt-[134px] ${flashSaleProducts.length === 0 ? "hidden" : ""}`}>
                     <div>
                         {/* Heading Starts Here */}
                         <div className="heading flex gap-3 items-center mb-4 md:mb-6">
