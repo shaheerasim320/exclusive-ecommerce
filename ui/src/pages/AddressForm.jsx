@@ -99,28 +99,26 @@ const EditAddress = () => {
     }
 
     const handleSaveButton = async () => {
-        setError(""); // Clear previous errors
+        setError("");
 
         const countryData = Country.getCountryByCode(selectedCountry);
         const stateData = State.getStateByCodeAndCountry(selectedState, selectedCountry);
 
         const allFieldsFilled = fullName !== "" && phone !== "" && userAddress !== "" && selectedCity != "" && selectedState !== "" && selectedCountry !== "";
-        console.log(selectedCity);
         if (!allFieldsFilled) {
             setFieldsFilled(false);
             return;
         }
-        setFieldsFilled(true); // Reset if it was false
+        setFieldsFilled(true);
 
         if (!isValidPhoneNumber("+" + phone)) {
             setError("Please fill valid phone number");
             return;
         }
 
-        setIsSaving(true); // Set saving state to true when button is clicked
+        setIsSaving(true);
         try {
             if (updateAddress) {
-                console.log(stateData);
                 const updatedData = {
                     name: fullName,
                     phoneNumber: phone,
@@ -129,13 +127,10 @@ const EditAddress = () => {
                     province: stateData?.name,
                     country: countryData?.name
                 };
-                console.log(updatedData);
-                // Dispatch actual Redux action for update
                 await dispatch(updateUserAddress({ addressId: addressID, updatedData: updatedData })).unwrap();
-                await dispatch(getSavedAddresses()).unwrap(); // Refresh saved addresses list
+                await dispatch(getSavedAddresses()).unwrap();
                 navigate("/address-book")
             } else {
-                // Dispatch actual Redux action for save
                 const { addressID: newAddressID } = await dispatch(saveAddress({
                     name: fullName,
                     phoneNumber: phone,
@@ -144,14 +139,14 @@ const EditAddress = () => {
                     province: stateData?.name,
                     country: countryData?.name
                 })).unwrap();
-                await dispatch(getSavedAddresses()).unwrap(); // Refresh saved addresses list
+                await dispatch(getSavedAddresses()).unwrap();
                 const redirectURL = location?.state?.redirectURL || "/address-book";
                 navigate(redirectURL, { state: { addressID: newAddressID } });
             }
         } catch (err) {
             setError(err.message || "An unexpected error occurred.");
         } finally {
-            setIsSaving(false); // Reset saving state to false after API call
+            setIsSaving(false);
         }
     };
 
@@ -211,19 +206,19 @@ const EditAddress = () => {
                                     <div className="phone-number w-full flex flex-col">
                                         <label htmlFor="phone" className="text-xs md:text-sm text-[#424242] mb-1">Phone Number</label>
                                         <PhoneInput
-                                            country={'pk'} // Default country set to Pakistan
+                                            country={'pk'}
                                             value={phone}
                                             onChange={handlePhoneChange}
                                             inputStyle={{
-                                                width: "100%", // Made responsive
+                                                width: "100%", 
                                                 height: "40px",
                                                 background: "#F5F5F5",
                                                 fontSize: "16px",
                                                 borderRadius: "5px",
                                                 border: "1px solid #ccc",
                                             }}
-                                            containerStyle={{ marginTop: "0" }} // Adjusted margin
-                                            countryCodeEditable={false} // Disable editing country code for consistency
+                                            containerStyle={{ marginTop: "0" }}
+                                            countryCodeEditable={false} 
                                         />
                                     </div>
                                     <div className="address flex flex-col w-full">
@@ -247,7 +242,7 @@ const EditAddress = () => {
                                             id="country"
                                             className="w-full h-10 px-3 bg-[#F5F5F5] focus:outline-none rounded-sm border border-gray-300"
                                             value={selectedCountry}
-                                            onChange={(e) => { setSelectedCountry(e.target.value); setSelectedState(""); setSelectedCity(""); }} // Reset state/city on country change
+                                            onChange={(e) => { setSelectedCountry(e.target.value); setSelectedState(""); setSelectedCity(""); }}
                                         >
                                             <option value="" disabled hidden>Select Your Country</option>
                                             {Country.getAllCountries().map((country) => (
@@ -264,7 +259,7 @@ const EditAddress = () => {
                                             id="province"
                                             className="w-full h-10 px-3 bg-[#F5F5F5] focus:outline-none rounded-sm border border-gray-300"
                                             disabled={selectedCountry === ""}
-                                            onChange={(e) => { setSelectedState(e.target.value); setSelectedCity(""); }} // Reset city on state change
+                                            onChange={(e) => { setSelectedState(e.target.value); setSelectedCity(""); }}
                                             value={selectedState}
                                         >
                                             <option value="" disabled hidden>Select Your Province/Region</option>
@@ -299,14 +294,14 @@ const EditAddress = () => {
                                 <button
                                     className="w-full sm:w-40 h-10 border-[1.5px] rounded-sm border-black border-opacity-30 hover:border-opacity-70 text-gray-700 font-semibold transition-colors duration-200"
                                     onClick={handleCancelButton}
-                                    disabled={isSaving} // Disable during saving
+                                    disabled={isSaving}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     className="w-full sm:w-40 h-10 bg-[#DB4444] text-white hover:bg-[#E07575] rounded-sm font-semibold transition-colors duration-200"
                                     onClick={handleSaveButton}
-                                    disabled={isSaving} // Disable during saving
+                                    disabled={isSaving} 
                                 >
                                     {isSaving ? "Saving..." : "SAVE"} {/* Conditional text */}
                                 </button>

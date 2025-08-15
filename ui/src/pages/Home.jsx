@@ -241,7 +241,6 @@ const Home = () => {
                                     className={`next w-10 h-10 rounded-full bg-[#F5F5F5] flex items-center justify-center transition-colors duration-200
                                         ${flashProductsStartIndex + 4 >= flashSaleProducts.length ? "opacity-50 cursor-not-allowed" : "hover:bg-[#a7a6a6] cursor-pointer"}`}
                                     onClick={() => {
-                                        // Check if there are enough products remaining to scroll
                                         if (flashProductsStartIndex + 4 < flashSaleProducts.length) {
                                             setFlashProductsStartIndex(flashProductsStartIndex + 1);
                                         }
@@ -267,8 +266,8 @@ const Home = () => {
                                         key={product._id}
                                         onWishlistToggle={handleWishlistToggle}
                                         onCartClick={handleAddToCartClick}
-                                        isWishlistSelected={items.some(item => item.product?._id === product._id)} // Check product._id
-                                        isAddToCartSelected={cartItems.some(item => item.product?._id === product._id)} // Check product._id
+                                        isWishlistSelected={items.some(item => item.product?._id === product._id)} 
+                                        isAddToCartSelected={cartItems.some(item => item.product?._id === product._id)}
                                     />
                                 ))
                             ) : (
@@ -328,11 +327,11 @@ const Home = () => {
                                     className={`next w-10 h-10 rounded-full bg-[#F5F5F5] flex items-center justify-center transition-colors duration-200
                                         ${categoryStartIndex + (window.innerWidth < 640 ? 2 : window.innerWidth < 768 ? 3 : window.innerWidth < 1024 ? 4 : window.innerWidth < 1280 ? 5 : 6) >= subCategories?.length ? "opacity-50 cursor-not-allowed" : "hover:bg-[#d4d4d4] hover:cursor-pointer"}`}
                                     onClick={() => {
-                                        const visibleCategoriesCount = window.innerWidth < 640 ? 2 : // 2 for small mobile
-                                            window.innerWidth < 768 ? 3 : // 3 for medium mobile/tablet
-                                                window.innerWidth < 1024 ? 4 : // 4 for tablet
-                                                    window.innerWidth < 1280 ? 5 : // 5 for small desktop
-                                                        6; // 6 for large desktop
+                                        const visibleCategoriesCount = window.innerWidth < 640 ? 2 :
+                                            window.innerWidth < 768 ? 3 : 
+                                                window.innerWidth < 1024 ? 4 : 
+                                                    window.innerWidth < 1280 ? 5 : 
+                                                        6; 
                                         if (categoryStartIndex + visibleCategoriesCount < subCategories?.length) {
                                             setCategoryStartIndex(categoryStartIndex + 1);
                                         }
@@ -407,10 +406,10 @@ const Home = () => {
                                     className={`next w-10 h-10 rounded-full bg-[#F5F5F5] flex items-center justify-center transition-colors duration-200
                                         ${bestSellingProductsStartIndex + (window.innerWidth < 640 ? 1 : window.innerWidth < 768 ? 2 : window.innerWidth < 1024 ? 3 : 4) >= bestSellingProducts.length ? "opacity-50 cursor-not-allowed" : "hover:bg-[#d4d4d4] hover:cursor-pointer"}`}
                                     onClick={() => {
-                                        const visibleProductsCount = window.innerWidth < 640 ? 1 : // 1 for small mobile (adjusted for single column)
-                                            window.innerWidth < 768 ? 2 : // 2 for medium mobile/tablet
-                                                window.innerWidth < 1024 ? 3 : // 3 for tablet
-                                                    4; // 4 for desktop
+                                        const visibleProductsCount = window.innerWidth < 640 ? 1 :
+                                            window.innerWidth < 768 ? 2 : 
+                                                window.innerWidth < 1024 ? 3 :
+                                                    4; 
                                         if (bestSellingProductsStartIndex + visibleProductsCount < bestSellingProducts.length) {
                                             setBestSellingProductsStartIndex(bestSellingProductsStartIndex + 1);
                                         }
@@ -532,7 +531,7 @@ const Home = () => {
                                     className={`next w-10 h-10 rounded-full bg-[#F5F5F5] flex items-center justify-center transition-colors duration-200
                                         ${productsStartIndex + 8 >= products.length ? "opacity-50 cursor-not-allowed" : "hover:bg-[#d4d4d4] hover:cursor-pointer"}`}
                                     onClick={() => {
-                                        const visibleProductsCount = 8; // Always showing 8 products in this section
+                                        const visibleProductsCount = 8;
                                         if (productsStartIndex + visibleProductsCount < products.length) {
                                             setProductsStartIndex(productsStartIndex + 1);
                                         }

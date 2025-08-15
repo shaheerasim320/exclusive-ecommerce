@@ -10,7 +10,7 @@ import { updateProfile } from '../slices/authSlice';
 
 const EditProfile = () => {
     const [isPasswordBoxVisible, setPasswordBoxVisible] = useState(false);
-    const [saving, setSaving] = useState(false);  // Add saving state
+    const [saving, setSaving] = useState(false);  
     const { user, error: userError, loading } = useSelector(state => state.auth);
     const [fullName, setFullName] = useState("");
     const [phone, setPhone] = useState("");
@@ -73,17 +73,15 @@ const EditProfile = () => {
                 Object.assign(payload, { currentPassword: currentPass, newPassword: newPass, confirmPassword: confirmNewPass });
             }
 
-            setSaving(true);  // Set saving state to true while the API is being hit
+            setSaving(true);  
             dispatch(updateProfile(payload))
-                .unwrap()  // Unwrap to get the result or handle error directly
+                .unwrap()  
                 .then(() => {
-                    // Navigate to profile page or show success message
-                    setSaving(false);  // Reset saving state after successful API call
+                    setSaving(false);
                     navigate("/my-profile");
                 })
                 .catch((error) => {
-                    // Handle any errors (e.g., display error message)
-                    setSaving(false);  // Reset saving state if there's an error
+                    setSaving(false);
                     setError(error);
                 });
         }
@@ -177,7 +175,7 @@ const EditProfile = () => {
                                 <button 
                                     onClick={handleSaveButton} 
                                     className="bg-[#DB4444] text-white px-6 py-3 rounded hover:bg-red-600"
-                                    disabled={saving} // Disable button while saving
+                                    disabled={saving}
                                 >
                                     {saving ? "Saving..." : "SAVE CHANGES"}  {/* Conditionally change text */}
                                 </button>

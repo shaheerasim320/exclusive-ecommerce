@@ -36,7 +36,6 @@ export default function LoginPage() {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isValidEmail = (email) => emailRegex.test(email);
 
-  // Handle form submit to perform login
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email } = formData;
@@ -99,7 +98,6 @@ export default function LoginPage() {
 
         if (res.data && res.data.billingId) {
           const billingPublicId = res.data.billingId;
-          console.log("Billing record created with public ID:", billingPublicId);
 
           navigate(`/billing?billingID=${billingPublicId}`);
 

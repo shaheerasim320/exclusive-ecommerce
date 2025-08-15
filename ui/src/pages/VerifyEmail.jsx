@@ -20,12 +20,10 @@ const VerifyEmail = () => {
       try {
         setShowLoader(true);
         const response = await api.post(`/users/verify/${token}`);
-        console.log(response);
         if (response?.status == 200) {
           setShowEmailConfirmModal(true);
         }
       } catch (err) {
-        console.log(err.response.data.message);
        setError(err?.response?.data?.message || "An error occurred. Please try again.");
       }finally{
         setShowLoader(false);

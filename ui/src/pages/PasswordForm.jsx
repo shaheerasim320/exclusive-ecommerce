@@ -6,7 +6,7 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [showPasswordFields, setShowPasswordFields] = useState(false); // Track if the token is present
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: ''
@@ -17,7 +17,6 @@ export default function ForgotPassword() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Check for token and flow type (reset or create) in the URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tokenFromUrl = params.get('token');
@@ -25,12 +24,11 @@ export default function ForgotPassword() {
     const create = params.get('create');
     
     if ((reset === 'true' || create === 'true') && !tokenFromUrl) {
-      // If both reset and create are true, but no token is provided, redirect to /p404
       navigate('/p404');
     } else {
       if (tokenFromUrl) {
         setToken(tokenFromUrl);
-        setShowPasswordFields(true); // Token present, show password reset fields
+        setShowPasswordFields(true);
       }
       if (reset === 'true') {
         setIsReset(true);
@@ -42,7 +40,6 @@ export default function ForgotPassword() {
     }
   }, [location, navigate]);
 
-  // Handle the email submission for password reset
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -55,7 +52,6 @@ export default function ForgotPassword() {
     }
   };
 
-  // Handle the password reset form submission
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
@@ -73,7 +69,6 @@ export default function ForgotPassword() {
     }
   };
 
-  // Handle input changes for both email and password form
   const handleInputChange = (e) => {
     setFormData({
       ...formData,

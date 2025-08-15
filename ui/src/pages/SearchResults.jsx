@@ -25,11 +25,9 @@ const SearchResults = () => {
     }
   }, [query]);
 
-  // Wishlist logic
   const handleWishlistToggle = (productId) => {
     const isWishlisted = wishlistItems.some(item => item.product?._id === productId || item._id === productId);
     if (isWishlisted) {
-      // Find the wishlist item id
       const wishlistItem = wishlistItems.find(item => item.product?._id === productId || item._id === productId);
       dispatch(removeFromWishlist({ wishlistItemId: wishlistItem._id })).then(() => dispatch(fetchWishlist()));
     } else {
@@ -37,7 +35,6 @@ const SearchResults = () => {
     }
   };
 
-  // Cart logic
   const handleCartClick = (productId, quantity = 1, size = null, color = null) => {
     dispatch(addToCart({ product: productId, quantity, size, color })).then(() => dispatch(fetchCart()));
   };

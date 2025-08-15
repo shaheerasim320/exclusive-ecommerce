@@ -40,7 +40,6 @@ export default function AuthCallback() {
 
         const res = await api.get("/users/get-user");
         dispatch(setUser(res.data.user));
-        console.log(guestWishlist, guestCart)
 
         const shouldShowModal = guestCart.data?.items?.length > 0 || guestWishlist.data?.items?.length > 0;
 

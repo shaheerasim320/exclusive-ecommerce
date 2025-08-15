@@ -6,13 +6,11 @@ import SizeComponent from '../components/SizeComponent'
 import { calculateDiscountPrice } from '../functions/DiscountPriceCalculator'
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Import the default styles
+import 'react-toastify/dist/ReactToastify.css';
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchProductByID } from '../slices/productSlice'
 import Loader from '../components/Loader'
 import ErrorModal from '../components/modals/ErrorModal'
-// import { clearDelayedAction, setDelayedAction } from '../slices/userSlice'
-// import { addItemToWishlist, getWishlistItems, removeFromWishlist } from '../slices/wishlistSlice'
 import api from '../api/axiosInstance'
 import { addToWishlist, removeFromWishlist } from '../slices/wishlistSlice'
 import { addToCart } from '../slices/cartSlice'
@@ -114,7 +112,6 @@ const ProductDetail = () => {
 
             if (res.data && res.data.billingId) {
                 const billingPublicId = res.data.billingId;
-                console.log("Billing record created with public ID:", billingPublicId);
 
                 navigate(`/billing?billingID=${billingPublicId}`);
             }

@@ -116,7 +116,7 @@ const AddressBook = () => {
                             <button
                                 className={`bg-[#DB4444] text-white py-3 px-8 rounded-sm text-base font-semibold hover:bg-[#E07575] transition-colors duration-200 w-full sm:w-[214px]`}
                                 onClick={handleButtonClick}
-                                disabled={(isDefaultBillingAddressClicked || isDefaultShippingAddressClicked) && !selectedAddress} // Disable save if no address is selected
+                                disabled={(isDefaultBillingAddressClicked || isDefaultShippingAddressClicked) && !selectedAddress}
                             >
                                 {isDefaultBillingAddressClicked || isDefaultShippingAddressClicked ? "SAVE" : "ADD NEW ADDRESS"}
                             </button>
