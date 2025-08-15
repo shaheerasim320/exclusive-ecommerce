@@ -60,7 +60,6 @@ const Header = () => {
     setAccountDropdownVisible(false);
   }
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.account-dropdown-container')) {
@@ -169,19 +168,6 @@ const Header = () => {
                     <Search size={20} className="text-gray-600" />
                   </button>
                 </form>
-              </div>
-
-              {/* Mobile Search Icon */}
-              <div className="md:hidden">
-                <button
-                  onClick={() => {
-                    const q = searchQuery.trim();
-                    if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <Search size={20} />
-                </button>
               </div>
 
               {/* Wishlist */}
@@ -312,36 +298,36 @@ const Header = () => {
               <nav>
                 <ul className="space-y-4">
                   <li>
-                    <span
+                    <Link to={"/"}
                       className={`block cursor-pointer text-lg ${activeLink === "home" ? "underline font-semibold" : "hover:underline"}`}
                       onClick={() => handleLinkClick("home")}
                     >
                       Home
-                    </span>
+                    </Link>
                   </li>
                   <li>
-                    <span
+                    <Link to={"/contact"}
                       className={`block cursor-pointer text-lg ${activeLink === "contact" ? "underline font-semibold" : "hover:underline"}`}
                       onClick={() => handleLinkClick("contact")}
                     >
                       Contact
-                    </span>
+                    </Link>
                   </li>
                   <li>
-                    <span
+                    <Link to={"/about"}
                       className={`block cursor-pointer text-lg ${activeLink === "about" ? "underline font-semibold" : "hover:underline"}`}
                       onClick={() => handleLinkClick("about")}
                     >
                       About
-                    </span>
+                    </Link>
                   </li>
                   <li>
-                    <span
+                    <Link to={"/signup"}
                       className={`block cursor-pointer text-lg ${activeLink === "signup" ? "underline font-semibold" : "hover:underline"}`}
                       onClick={() => handleLinkClick("signup")}
                     >
                       Sign Up
-                    </span>
+                    </Link>
                   </li>
                 </ul>
               </nav>

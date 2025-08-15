@@ -7,6 +7,9 @@ import MergeModal from '../components/modals/MergeModal';
 import { useLocation, useNavigate } from "react-router-dom";
 import { getWithExpiry } from '../utils/expiringLocalStorage';
 import api from '../api/axiosInstance';
+import { getDefaultBillingAddress, getDefaultShippingAddress } from '../slices/addressSlice';
+import { getCancelledOrders, getPlacedOrders, getReturnedOrders } from '../slices/orderSlice';
+import { getDefaultCard, getSavedCards } from '../slices/cardSlice';
 
 
 export default function LoginPage() {
@@ -48,8 +51,15 @@ export default function LoginPage() {
       if (login.fulfilled.match(result)) {
         setErrorMessage("");
         dispatch(setAccessToken(result.payload.accessToken));
+        dispatch(getSavedAddresses());
+        dispatch(getDefaultShippingAddress());
+        dispatch(getDefaultBillingAddress());
+        dispatch(getPlacedOrders());
+        dispatch(getReturnedOrders());
+        dispatch(getCancelledOrders());
+        dispatch(getSavedCards());
+        dispatch(getDefaultCard());
 
-        // Fetch guest wishlist and cart and use their returned values
         const guestWishlist = await dispatch(fetchWishlist()).unwrap();
         const guestCart = await dispatch(fetchCart()).unwrap();
         const shouldShowModal = guestWishlist.length > 0 || guestCart.length > 0;
@@ -67,7 +77,7 @@ export default function LoginPage() {
 
   };
   const performRedirect = async () => {
-    const redirectIntent = getWithExpiry("postAuthRedirect"); 
+    const redirectIntent = getWithExpiry("postAuthRedirect");
 
     if (redirectIntent && redirectIntent.type == "buyNow") {
       localStorage.removeItem("postAuthRedirect");
@@ -128,7 +138,7 @@ export default function LoginPage() {
               <h1 className="text-3xl font-bold text-gray-800 mb-2">Sign In</h1>
               <p className="text-gray-600 mb-4">Enter your credentials to access your account</p>
 
-              {(errorMessage || error && error!="No refresh token") && (
+              {(errorMessage || error && error != "No refresh token") && (
                 <div className="text-red-500 text-sm my-3">
                   {errorMessage || error}
                 </div>

@@ -59,7 +59,7 @@ const CategoryPage = () => {
   return (
     <div>
       {(loading) && <div className="h-screen flex items-center justify-center"><Loader /></div>}
-      <div className={`w-[1170px] ${(loading) ? "hidden" : "flex gap-[0.5rem]"} mx-auto flex-col py-4`}>
+      <div className={`w-full max-w-[1170px] ${(loading) ? "hidden" : "flex gap-[0.5rem]"} mx-auto flex-col px-4 py-4`}>
         <div className="bread-crumb">
           <Link to="/" className="text-[#605f5f] text-[14px] hover:text-black">Home</Link><span className="m-[11px] text-[14px] text-[#605f5f]">/</span><span className={`text-[14px] text-[#605f5f] hover:text-black cursor-pointer ${parentCategory == null ? "hidden" : ""}`}>{parentCategory}</span><span className={`m-[11px] text-[14px] text-[#605f5f] ${parentCategory == null ? "hidden" : ""}`}>/</span><Link to={`/category/${categorySlug}`} className="text-[14px]">{categoryName}</Link>
         </div>
@@ -78,10 +78,10 @@ const CategoryPage = () => {
         </div>
       </div>
       <ToastContainer
-        position="bottom-right" // Position of the toast message
-        autoClose={3000} // Duration in milliseconds before toast disappears
-        hideProgressBar={false} // Hide progress bar for simplicity
-        closeOnClick={true} // Allow closing the toast by clicking
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick={true}
         pauseOnHover
       />
     </div>

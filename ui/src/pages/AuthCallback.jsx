@@ -8,6 +8,9 @@ import { fetchCart } from "../slices/cartSlice";
 import MergeModal from "../components/modals/MergeModal";
 import { getWithExpiry } from "../utils/expiringLocalStorage";
 import Loader from "../components/Loader";
+import { getDefaultBillingAddress, getDefaultShippingAddress, getSavedAddresses } from "../slices/addressSlice";
+import { getCancelledOrders, getPlacedOrders, getReturnedOrders } from "../slices/orderSlice";
+import { getDefaultCard, getSavedCards } from "../slices/cardSlice";
 
 export default function AuthCallback() {
   const dispatch = useDispatch();
@@ -30,25 +33,29 @@ export default function AuthCallback() {
       }
 
       try {
-        // 1. Fetch guest cart/wishlist and get their values
         const guestWishlist = await api.get("/wishlist/get-guest-wishlist-items");
         const guestCart = await api.get("/cart/get-guest-cart-items");
 
-        // 2. Store access token
         dispatch(setAccessToken(token));
 
-        // 3. Fetch and set user (after guest data is fetched)
         const res = await api.get("/users/get-user");
         dispatch(setUser(res.data.user));
         console.log(guestWishlist, guestCart)
 
-        // 4. Check if merge modal should be shown after the data is fetched
         const shouldShowModal = guestCart.data?.items?.length > 0 || guestWishlist.data?.items?.length > 0;
+
+        dispatch(getSavedAddresses());
+        dispatch(getDefaultShippingAddress());
+        dispatch(getDefaultBillingAddress());
+        dispatch(getPlacedOrders());
+        dispatch(getReturnedOrders());
+        dispatch(getCancelledOrders());
+        dispatch(getSavedCards());
+        dispatch(getDefaultCard());
 
         if (shouldShowModal) {
           setShowMergeModal(true);
         } else {
-          // Fetch cart/wishlist again if no modal
           dispatch(fetchCart());
           dispatch(fetchWishlist());
           performRedirect();
