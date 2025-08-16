@@ -55,7 +55,7 @@ const About = () => {
   ]
 
   return (
-    <div className="px-8">
+    <div className="px-8 md:mt-36 mt-48">
       {/* Breadcrumbs */}
       <div className="max-w-7xl mx-auto my-6">
         <Link to="/" className="text-[#605f5f] text-sm hover:text-black">Home</Link>

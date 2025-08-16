@@ -58,7 +58,7 @@ export default function ForgotPassword() {
 
     const handlePasswordSubmit = async (e) => {
         e.preventDefault();
-        setPasswordMismatchError(''); // Clear any previous errors
+        setPasswordMismatchError('');
 
         if (formData.password !== formData.confirmPassword) {
             setPasswordMismatchError('Passwords do not match');
@@ -89,7 +89,7 @@ export default function ForgotPassword() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6  md:mt-28 mt-40">
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-7xl w-full">
                 <div className="flex flex-col lg:flex-row min-h-[600px]">
                     <div className="lg:w-1/2 ">

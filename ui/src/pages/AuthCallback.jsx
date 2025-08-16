@@ -9,7 +9,7 @@ import MergeModal from "../components/modals/MergeModal";
 import { getWithExpiry } from "../utils/expiringLocalStorage";
 import Loader from "../components/Loader";
 import { getDefaultBillingAddress, getDefaultShippingAddress, getSavedAddresses } from "../slices/addressSlice";
-import { getCancelledOrders, getPlacedOrders, getReturnedOrders } from "../slices/orderSlice";
+import { getCancelledOrders, getPlacedOrders, getRecentOrders, getReturnedOrders } from "../slices/orderSlice";
 import { getDefaultCard, getSavedCards } from "../slices/cardSlice";
 
 export default function AuthCallback() {
@@ -51,6 +51,7 @@ export default function AuthCallback() {
         dispatch(getCancelledOrders());
         dispatch(getSavedCards());
         dispatch(getDefaultCard());
+        dispatch(getRecentOrders())
 
         if (shouldShowModal) {
           setShowMergeModal(true);

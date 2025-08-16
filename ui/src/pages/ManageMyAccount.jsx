@@ -16,20 +16,14 @@ const ManageMyAccount = () => {
     const { defaultShippingAddress, defaultBillingAddress, loading, error } = useSelector(state => state.address)
     const { recentOrders, loading: OrderLoading } = useSelector(state => state.order)
     useEffect(() => {
-        dispatch(getDefaultBillingAddress())
-        dispatch(getDefaultShippingAddress())
-        dispatch(getRecentOrders())
-    }, [dispatch])
-    useEffect(() => {
         if (!user) {
             navigate("/login", { state: { from: location.pathname } })
         }
     }, [user])
     return (
         <div>
-            {(loading || OrderLoading) && <Loader />} {/* Show loader when any data is loading */}
+            {(loading || OrderLoading) && <div className="h-screen flex justify-center items-center"><Loader /></div>}
 
-            {/* Content area, hidden if loading */}
             <div className={`${(loading || OrderLoading) ? "hidden" : ""}`}>
                 {/* Breadcrumbs */}
                 <div className="nav w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto h-auto my-4 md:my-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
@@ -42,17 +36,15 @@ const ManageMyAccount = () => {
                         <h6>Welcome! <span className="text-[#DB4444]">{user?.fullName}</span></h6>
                     </div>
                 </div>
-                {/* Breadcrumbs Ends Here*/}
 
                 {/* Main Content Section */}
                 <section className="w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto mb-10 md:mb-16 flex flex-col lg:flex-row lg:gap-10">
-                    
 
-                    <div className="outer-box flex flex-col gap-8 w-full lg:w-[945px]">
+                    <div className="outer-box flex flex-col gap-8 w-full lg:flex-row lg:flex-wrap">
                         {/* Personal Profile and Address Book */}
                         <div className="manage-my-account w-full flex flex-col md:flex-row md:gap-8 lg:gap-[35px]">
                             {/* Personal Profile Card */}
-                            <div className="personal-profile w-full md:w-[calc(50%-16px)] lg:w-[300px] flex flex-col gap-2 p-4 shadow-md rounded-md">
+                            <div className="personal-profile md:max-w-96 w-full md:flex-1 flex flex-col gap-2 p-4 shadow-md rounded-md">
                                 <div className="title flex items-center">
                                     <h5 className="text-xl md:text-2xl font-semibold">Personal Profile</h5>
                                     <div className="border-l h-4 border-black mx-2" />
@@ -67,7 +59,7 @@ const ManageMyAccount = () => {
                             </div>
 
                             {/* Address Book Section */}
-                            <div className="address-book flex flex-col sm:flex-row sm:gap-4 md:gap-2 w-full md:w-[calc(50%-16px)] lg:w-[610px] shadow-md rounded-md p-4">
+                            <div className="address-book flex flex-col sm:flex-row sm:gap-4 md:gap-2 w-full md:flex-1 shadow-md rounded-md p-4">
                                 {/* Default Shipping Address */}
                                 <div className="default-shipping-address w-full sm:w-1/2 flex flex-col gap-2">
                                     <div className="title flex items-center mb-2">
@@ -97,7 +89,7 @@ const ManageMyAccount = () => {
 
                                 {/* Default Billing Address */}
                                 <div className="default-billing-address w-full sm:w-1/2 flex flex-col gap-2">
-                                    <div className="name mb-2 sm:mt-[32px]"> {/* Adjusted margin for alignment */}
+                                    <div className="name mb-2 sm:mt-[32px]">
                                         <h5 className="text-xs uppercase text-[#767676]">DEFAULT BILLING ADDRESS</h5>
                                     </div>
                                     <div className="address flex flex-col text-sm">

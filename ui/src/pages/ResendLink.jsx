@@ -74,7 +74,7 @@ export default function ResendVerificationLink() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 md:mt-28 mt-40">
       {showEmailSentModal && <EmailSentModal name={name} onClose={handleCloseClick} onResend={handleResendClick} />}
       {error != "" && error != "Please enter a valid email address." && <ErrorModal message={error} btnMessage={error == "Your email is already verified. Please log in instead." ? "Log in" : "Retry"} onClose={handleErrorModalClose} />}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-7xl w-full">

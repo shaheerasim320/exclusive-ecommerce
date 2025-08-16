@@ -60,7 +60,7 @@ const AllFlashSaleProduct = () => {
     };
 
     return (
-        <div className='py-6 px-8 font-inter'>
+        <div className='py-6 px-8 font-inter md:mt-28 mt-40'>
             {/* Title and Timer */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">

@@ -123,7 +123,7 @@ const Home = () => {
 
     const flashSaleTimer = timers.find((timer) => timer.id === 1000) || { time: 0 };
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen md:mt-28 mt-40">
             {loading || cartLoading || categoryLoading ? <div className="h-screen flex justify-center items-center"><Loader /></div> : ""}
             {error ? <ErrorModal onClose={() => handleClose()} message={"Server Error. Something went wrong!"} btnMessage={"Retry"} /> : ""}
             <div className={`${loading || cartLoading || categoryLoading ? "hidden" : ""} ${error ? "hidden" : ""}`}>

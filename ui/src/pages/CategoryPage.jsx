@@ -57,7 +57,7 @@ const CategoryPage = () => {
   }
 
   return (
-    <div>
+    <div className='md:mt-28 mt-48'>
       {(loading) && <div className="h-screen flex items-center justify-center"><Loader /></div>}
       <div className={`w-full max-w-[1170px] ${(loading) ? "hidden" : "flex gap-[0.5rem]"} mx-auto flex-col px-4 py-4`}>
         <div className="bread-crumb">

@@ -59,6 +59,9 @@ const Cart = () => {
             });
 
             if (res.data && res.data.billingId) {
+                cartItems.forEach(item => {
+                    dispatch(removeFromCart({ cartItemId: item._id }));
+                })
                 const billingPublicId = res.data.billingId;
                 navigate(`/billing?billingID=${billingPublicId}`);
             }
@@ -79,17 +82,17 @@ const Cart = () => {
     };
 
     return (
-        <div className="px-4 sm:px-6 lg:px-8">
+        <div className="px-4 sm:px-6 lg:px-8 md:mt-24 mt-40">
             {(cartLoader) && <div className="h-screen flex items-center justify-center"> <Loader /> </div>}
             <div className={`${cartLoader ? "hidden" : "py-8"}`}>
                 {/* Breadcrumbs */}
-                <div className="nav w-max my-4 text-sm">
+                <div className="nav max-w-6xl h-[21px] my-4 mx-auto text-sm">
                     <Link to="/" className="text-[#605f5f] hover:text-black">Home</Link>
                     <span className="mx-2 text-[#605f5f]">/</span>
                     <Link to="#">Cart</Link>
                 </div>
                 {/* Cart */}
-                <section className="cart flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
+                <section className="cart flex flex-col max-w-6xl mb-32 mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="prod-details flex flex-col gap-6">
                         <div className="product flex flex-col">
                             <table className={items?.length > 0 ? 'w-full' : 'hidden'}>

@@ -16,7 +16,6 @@ const PaymentOption = () => {
         if (!user) {
             navigate("/login", { state: { from: location.pathname } });
         }
-        dispatch(getSavedCards());
     }, [dispatch]);
 
     const handleDelete = async (cardID) => {
@@ -30,7 +29,7 @@ const PaymentOption = () => {
 
     return (
         <div>
-            {loading && <Loader />}
+            {loading && <div className="h-screen flex justify-center items-center"><Loader /></div>}
             <div className={`${loading ? "hidden" : ""}`}>
                 {/* Breadcrumbs */}
                 <div className="nav w-full px-4 md:px-8 lg:max-w-[1170px] lg:mx-auto h-auto my-4 md:my-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">

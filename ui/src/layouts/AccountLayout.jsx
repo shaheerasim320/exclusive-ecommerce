@@ -8,8 +8,8 @@ import { Outlet } from "react-router-dom";
 const AccountLayout = () => {
   return (
     <>
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row mt-6 px-4">
-        <div className="lg:w-[185px] w-full mb-6 lg:mb-0">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row px-4 md:mt-28 mt-40">
+        <div className="lg:w-[185px] w-full my-5 lg:mb-0">
           <Aside />
         </div>
         <div className="flex-1">

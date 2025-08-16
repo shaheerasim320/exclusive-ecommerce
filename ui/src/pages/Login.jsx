@@ -58,10 +58,12 @@ export default function LoginPage() {
       dispatch(getCancelledOrders());
       dispatch(getSavedCards());
       dispatch(getDefaultCard());
+      dispatch(getRecentOrders())
 
-      const guestWishlist = await dispatch(fetchWishlist()).unwrap();
-      const guestCart = await dispatch(fetchCart()).unwrap();
-      const shouldShowModal = guestWishlist.length > 0 || guestCart.length > 0;
+      const guestWishlist = await api.get("/wishlist/get-guest-wishlist-items");
+      const guestCart = await api.get("/cart/get-guest-cart-items");
+
+      const shouldShowModal = guestCart.data?.items?.length > 0 || guestWishlist.data?.items?.length > 0;
 
       setShowMergeModal(shouldShowModal);
 
@@ -117,7 +119,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 md:mt-28 mt-40">
       {showMergeModal && <MergeModal onClose={handleOnClose} />}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-7xl w-full">
         <div className="flex flex-col lg:flex-row min-h-[600px]">

@@ -139,7 +139,7 @@ const ProductDetail = () => {
         window.location.reload()
     }
     return (
-        <div>
+        <div className='md:mt-28 mt-40'>
             {(loading || productLoading) && (
                 <div className="h-screen flex items-center justify-center">
                     <Loader />

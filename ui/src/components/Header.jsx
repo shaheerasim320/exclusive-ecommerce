@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X, Search, Heart, ShoppingCart, User, ChevronDown } from "lucide-react";
+import { Menu, X, Search, Heart, ShoppingCart, User, ChevronDown, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../slices/authSlice";
@@ -72,7 +72,7 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="w-full">
+    <header className="w-full fixed top-0 left-0 z-50 bg-white">
       {/* Top Header */}
       <div className="top-header bg-black py-2 md:py-3">
         <div className="container mx-auto px-4">
@@ -213,6 +213,7 @@ const Header = () => {
                     <div className="px-4 space-y-3">
                       <Link to="/manage-my-account"
                         className="w-full flex items-center gap-3 p-2 hover:bg-gray-500 rounded transition-colors"
+                        onClick={hideAccountDropdown}
                       >
                         <User size={20} className="text-white" />
                         <span className="text-sm text-white">Manage My Account</span>
@@ -220,6 +221,8 @@ const Header = () => {
 
                       <Link to="/orders"
                         className="w-full flex items-center gap-3 p-2 hover:bg-gray-500 rounded transition-colors"
+                        onClick={hideAccountDropdown}
+                        
                       >
                         <ShoppingCart size={20} className="text-white" />
                         <span className="text-sm text-white">My Orders</span>
@@ -227,6 +230,8 @@ const Header = () => {
 
                       <Link to="/cancellation"
                         className="w-full flex items-center gap-3 p-2 hover:bg-gray-500 rounded transition-colors"
+                        onClick={hideAccountDropdown}
+                      
                       >
                         <X size={20} className="text-white" />
                         <span className="text-sm text-white">My Cancellations</span>
@@ -235,6 +240,7 @@ const Header = () => {
                       {user?.role === "admin" && (
                         <Link to="/admin-dashboard"
                           className="w-full flex items-center gap-3 p-2 hover:bg-gray-500 rounded transition-colors"
+                          onClick={hideAccountDropdown}
                         >
                           <div className="w-5 h-5 bg-white rounded-sm"></div>
                           <span className="text-sm text-white">Admin Dashboard</span>
@@ -246,7 +252,7 @@ const Header = () => {
                       <a
                         className="w-full flex items-center gap-3 p-2 hover:bg-gray-500 rounded transition-colors cursor-pointer" onClick={handleLogout}
                       >
-                        <div className="w-5 h-5 border-2 border-white rounded"></div>
+                        <LogOut size={20} className="text-white" />
                         <span className="text-sm text-white">Logout</span>
                       </a>
                     </div>

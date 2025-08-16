@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 const P404 = () => {
     return (
-        <div>
+        <div className='md:mt-28 mt-40'>
             <div>
                 {/* Breadcrumbs - Made responsive with fluid width, padding, and adjusted text sizes */}
                 <div className="nav w-full px-4 md:px-8 lg:max-w-[1156px] mx-auto py-4 md:py-6">

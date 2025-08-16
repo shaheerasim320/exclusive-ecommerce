@@ -40,7 +40,7 @@ const SearchResults = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 md:mt-28 mt-40">
       <h2 className="text-2xl font-bold mb-4">Search Results for "{query}"</h2>
       {loading ? (
         <div>Loading...</div>

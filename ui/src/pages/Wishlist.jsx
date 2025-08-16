@@ -71,7 +71,7 @@ const Wishlist = () => {
 
 
     return (
-        <div className="min-h-[320px] px-4 sm:px-6 lg:px-8">
+        <div className="min-h-[320px] px-4 sm:px-6 lg:px-8 md:mt-36 mt-40">
             {cartLoader || loading ? <Loader /> : ""}
             {showErrorModal && <ErrorModal message={error} btnMessage={"Retry"} onClose={handleClose} />}
             {/* Breadcrumbs */}
@@ -81,7 +81,7 @@ const Wishlist = () => {
                 <Link to="#">Wishlist</Link>
             </div>
 
-            <section className="wishlist-container max-w-6xl mx-auto mb-[120px] flex flex-col gap-20">
+            <section className="wishlist-container max-w-6xl mx-auto mb-32 flex flex-col gap-20">
                 {/* Wishlist */}
                 <div className={`wishlist ${items?.length > 0 && !cartLoader ? 'flex' : 'hidden'} flex-col gap-16`}>
                     <div className="header h-14 flex flex-col sm:flex-row items-start sm:items-center gap-4">

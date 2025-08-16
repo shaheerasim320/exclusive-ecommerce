@@ -7,7 +7,7 @@ const Contact = () => {
 
     if (state.succeeded) {
         return (
-            <div className="w-full max-w-6xl mx-auto my-24 text-center">
+            <div className="w-full max-w-6xl mx-auto my-24 text-center md:mt-28 mt-40">
                 <h2 className="text-2xl font-bold text-[#DB4444]">Thanks for your message!</h2>
                 <p className="mt-4 text-gray-700">We'll get back to you within 24 hours.</p>
                 <Link to="/" className="inline-block mt-8 bg-[#DB4444] text-white hover:bg-[#E07575] rounded-sm px-6 py-2">
@@ -18,7 +18,7 @@ const Contact = () => {
     }
 
     return (
-        <div className="px-4 md:px-8 lg:px-0">
+        <div className="px-4 md:px-8 lg:px-0 md:mt-36 mt-48">
             {/* Breadcrumbs */}
             <div className="w-full max-w-6xl mx-auto my-8">
                 <div className="text-sm text-[#605f5f]">

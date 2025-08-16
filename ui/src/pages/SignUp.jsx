@@ -110,7 +110,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-6 md:mt-28 mt-40">
       {showEmailSentModal && <EmailSentModal name={formData.fullName} onResend={handleResendClick} onClose={handleCloseClick} />}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-7xl w-full">
         <div className="flex flex-col lg:flex-row min-h-[700px]">

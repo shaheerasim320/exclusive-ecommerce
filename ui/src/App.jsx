@@ -168,8 +168,6 @@ function App() {
           <Route path="/email/verify" element={<VerifyEmail />} />
           <Route path="/resend-link" element={<ResendLink />} />
           <Route path="/password-form" element={<PasswordForm />} />
-          <Route path="/payment-complete" element={<OrderSuccessModal />} />
-          <Route path="/merge-modal" element={<MergeModal />} />
           <Route path="/category/:categorySlug" element={<CategoryPage />} />
           <Route path="/all-products" element={<AllProducts />} />
           <Route path="/search" element={<SearchResults />} />

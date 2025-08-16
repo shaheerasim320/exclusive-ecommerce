@@ -47,7 +47,7 @@ const VerifyEmail = () => {
     navigate("/login")
   }
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 md:mt-28 mt-40">
       {showEmailConfirmModal && <EmailConfirmModal onClick={handleLoginPageClick} />}
       {error!="" && (
         <ErrorModal

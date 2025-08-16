@@ -41,7 +41,7 @@ const OrderDetail = () => {
         await dispatch(getOrderByID({ orderID })).unwrap()
     }
     return (
-        <div>
+        <div className='md:mt-28 mt-40'>
             {loading &&<div className="flex h-screen justify-center"><Loader /></div>}
             <div className={`${loading ? "hidden" : ""}`}>
                 {/* Breadcrumbs - Made responsive */}

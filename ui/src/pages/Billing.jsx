@@ -400,7 +400,7 @@ const Billing = () => {
     };
 
     return (
-        <div className="min-h-[320px] px-4 sm:px-6 lg:px-8 font-inter">
+        <div className="min-h-[320px] px-4 sm:px-6 lg:px-8 font-inter  md:mt-36 mt-48">
             {(loading || orderLoading) && (
                 <div className="flex justify-center items-center h-screen w-full fixed inset-0 bg-white bg-opacity-75 z-50">
                     <Loader />
