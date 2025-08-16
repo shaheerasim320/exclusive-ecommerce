@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import EmailSentModal from '../components/modals/EmailSentModal';
 import ErrorModal from '../components/modals/ErrorModal';
+import api from '../api/axiosInstance';
 
 export default function ResendVerificationLink() {
   const [email, setEmail] = useState('');
@@ -36,7 +36,7 @@ export default function ResendVerificationLink() {
     }
 
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/users/resend-token", { email });
+      const response = await api.post("/users/resend-token", { email });
       if (response?.status == 200) {
         setName(response.data.name);
         setShowEmailSentModal(true);
@@ -50,7 +50,7 @@ export default function ResendVerificationLink() {
 
   const handleResendClick = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/users/resend-token", { email });
+      const response = await api.post("/users/resend-token", { email });
       if (response?.status == 200) {
         setShowEmailSentModal(true);
       }
@@ -65,10 +65,10 @@ export default function ResendVerificationLink() {
   }
 
   const handleErrorModalClose = () => {
-    if(error=="Your email is already verified. Please log in instead."){
+    if (error == "Your email is already verified. Please log in instead.") {
       setError("")
       navigate("/login")
-    }else{
+    } else {
       setError("");
     }
   }
@@ -95,7 +95,7 @@ export default function ResendVerificationLink() {
                 Enter your email to receive a new verification link.
               </p>
               {/* Error Message */}
-              {error!="Your email is already verified. Please log in instead." && <div className="text-red-500 text-sm my-3">{error}</div>}
+              {error != "Your email is already verified. Please log in instead." && <div className="text-red-500 text-sm my-3">{error}</div>}
               {/* Email Form */}
               <div className="relative mb-4">
                 <input
