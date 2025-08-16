@@ -37,9 +37,6 @@ const Wishlist = () => {
         }
     };
 
-    const handleMoveAllToBag = async () => {
-        // Placeholder for moving all items to bag functionality
-    }
 
     const handleClose = () => {
         setShowErrorModal(false);
@@ -71,6 +68,7 @@ const Wishlist = () => {
             setShowErrorModal(true);
         }
     }, [error]);
+
 
     return (
         <div className="min-h-[320px] px-4 sm:px-6 lg:px-8">

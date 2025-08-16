@@ -96,10 +96,10 @@ const Cart = () => {
                                 {/* Hide the table header on small screens */}
                                 <thead className="header shadow-md hidden sm:table-header-group">
                                     <tr className="w-full grid grid-cols-4 p-6">
-                                        <th className="font-normal text-left">Product</th>
-                                        <th className="font-normal text-left">Price</th>
-                                        <th className="font-normal text-left">Quantity</th>
-                                        <th className="font-normal text-left">Subtotal</th>
+                                        <th className="font-normal text-center">Product</th>
+                                        <th className="font-normal text-center">Price</th>
+                                        <th className="font-normal text-center">Quantity</th>
+                                        <th className="font-normal text-center">Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody className="flex flex-col sm:table-row-group">
