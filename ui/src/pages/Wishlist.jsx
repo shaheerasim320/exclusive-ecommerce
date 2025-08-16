@@ -71,7 +71,7 @@ const Wishlist = () => {
 
 
     return (
-        <div className="min-h-[320px] px-4 sm:px-6 lg:px-8 md:mt-36 mt-40">
+        <div className="min-h-[320px] px-4 sm:px-6 lg:px-8 md:mt-36 mt-48">
             {cartLoader || loading ? <Loader /> : ""}
             {showErrorModal && <ErrorModal message={error} btnMessage={"Retry"} onClose={handleClose} />}
             {/* Breadcrumbs */}
