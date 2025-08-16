@@ -257,7 +257,7 @@ const Billing = () => {
                     color: item.color,
                     size: item.size,
                     price: item.product.price,
-                    discount: item.product.discount
+                    discount: item.product?.flashSaleDiscount > 0 ? item.product.flashSaleDiscount : item.product.discount
                 })),
                 couponCode: coupon?.code || null,
                 couponDiscountAmount: couponDiscount,
