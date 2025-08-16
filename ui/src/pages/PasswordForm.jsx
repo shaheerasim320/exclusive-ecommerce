@@ -43,7 +43,7 @@ export default function ForgotPassword() {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/api/v1/users/password-reset', { email });
+      const response = await api.post('/users/password-reset', { email });
       setMessage(response.data.message);
       setError('');
     } catch (err) {
@@ -60,7 +60,7 @@ export default function ForgotPassword() {
     }
 
     try {
-      const response = await api.post('/api/v1/users/reset-password', { token, password: formData.password });
+      const response = await api.post('/users/reset-password', { token, password: formData.password });
       setMessage(response.data.message);
       setError('');
     } catch (err) {
