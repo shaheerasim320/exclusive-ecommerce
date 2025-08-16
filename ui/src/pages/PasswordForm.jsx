@@ -45,10 +45,11 @@ export default function ForgotPassword() {
     try {
       const response = await api.post('/users/password-reset', { email });
       setMessage(response.data.message);
-      setError('');
+      setError("");
+      setEmail("")
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred');
-      setMessage('');
+      setError(err.response?.data?.message || 'An error occurred. Please try again');
+      setMessage("");
     }
   };
 
@@ -62,10 +63,12 @@ export default function ForgotPassword() {
     try {
       const response = await api.post('/users/reset-password', { token, password: formData.password });
       setMessage(response.data.message);
-      setError('');
+      setError("");
+      setFormData({ password: '', confirmPassword: '' });
+      navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred');
-      setMessage('');
+      setMessage("");
     }
   };
 
