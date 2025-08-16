@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm, ValidationError } from '@formspree/react';
 
 const Contact = () => {
     const [state, handleSubmit] = useForm("mkgzeyla");
+
+    useEffect(()=>{
+        if(state.succeeded) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    },[state.succeeded]);
 
     if (state.succeeded) {
         return (

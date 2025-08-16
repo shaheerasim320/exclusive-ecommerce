@@ -6,21 +6,19 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { toast, ToastContainer } from 'react-toastify';
 import { addToWishlist, removeFromWishlist } from '../slices/wishlistSlice';
-import { addToCart, updateProductQuantity } from '../slices/cartSlice'; // Added updateProductQuantity import
+import { addToCart, updateProductQuantity } from '../slices/cartSlice'; 
 
-const PRODUCTS_PER_PAGE = 8; // Define how many products to show per page
+const PRODUCTS_PER_PAGE = 8; 
 
 const AllProducts = () => {
-    const [loading, setLoading] = useState(false); // Changed to false as useEffect handles loading
+    const [loading, setLoading] = useState(false);
     const { items, error: wishlistError } = useSelector(state => state.wishlist)
     const { cart: cartItems, error: cartError, loading: cartLoading } = useSelector(state => state.cart)
     const { allProducts } = useSelector(state => state.products)
     const dispatch = useDispatch()
 
-    // State for pagination
     const [currentPage, setCurrentPage] = useState(1);
 
-    // Fetch all products on component mount
     useEffect(() => {
         setLoading(true);
         dispatch(fetchAllProducts())
@@ -51,14 +49,12 @@ const AllProducts = () => {
         toast.success("Product added to cart");
     };
 
-    // Calculate total pages and products for the current page
     const totalPages = Math.ceil(allProducts.length / PRODUCTS_PER_PAGE);
     const paginatedProducts = allProducts.slice(
         (currentPage - 1) * PRODUCTS_PER_PAGE,
         currentPage * PRODUCTS_PER_PAGE
     );
 
-    // Handle page change and scroll to top
     const handlePageChange = (pageNum) => {
         setCurrentPage(pageNum);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -76,7 +72,6 @@ const AllProducts = () => {
 
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
                     <h1 className="text-2xl md:text-3xl font-semibold mb-4 sm:mb-0">All Products</h1>
-                    {/* Navigation buttons removed */}
                 </div>
 
                 <div className="products flex flex-col gap-8 mb-10">
